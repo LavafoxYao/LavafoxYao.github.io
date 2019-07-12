@@ -32,10 +32,8 @@ categories: 生产工具及环境的折腾
 注意经过测试使用snapshot打印快照只保存关机时刻的虚拟机状态,意思就是如果你在开机状态使用snapshot打印快照并不会保存运行时的状态,而是保存本次关机之后的状态,所以snapshot建议关闭qemu再使用。
 
 ```shell
-
 	qemu-img snapshot -c snapshot01 cneos_ips_lihuiyun.qcow2 #创建snapshot01
 	qemu-img snapshot -l snapshot cneos_ips_lihuiyun.qcow2   #查看快照
-	
 ```
 
 ![](<https://raw.githubusercontent.com/LavafoxYao/MarkdownPhotos/master/2.png>)
