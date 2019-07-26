@@ -14,7 +14,7 @@
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="{{ page.lang || page.language || config.language }}">
   {% if theme.canvas_nest %}
-  <script type="text/javascript" color="25,202,173" opacity='0.8' zIndex="-2" count="60" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  <script type="text/javascript" color="25,202,173" opacity='0.8' zIndex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
   {% endif %}
 
   {% set container_class = "container " %}
