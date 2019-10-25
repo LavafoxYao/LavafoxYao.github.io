@@ -18,12 +18,13 @@ categories: 生产工具及环境的折腾
 用户级配置文件目录:~/.vim/vimrc
 ##### Vim分屏
 ```shell
-sp xxx.test  //横屏
-vsp xxx.test //竖屏
+#命令模式下
+sp   		 //横屏
+vsp 		 //竖屏
 Crtl-w       //切屏
 //切换到命令模式下
-qall        //不保存
-wall        //全部保存退出
+qall         //不保存
+wall         //全部保存退出
 ```
 
 ### 第一章 Vim解决问题的方式

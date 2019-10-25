@@ -116,9 +116,9 @@ locate [-iS] filename       #查找的是/var/lib/mlocate
 -S 输出locate所使用的数据库文件的相关信息
 #updatedb 更新数据库文件信息
 
-find [PATH] [-ioname / -type / -user] [字符串]
+find [PATH] [-iname /-name / -type / -user] [字符串]
 
-//type                      #一般用于判断一个命令是否为内置命令
+type                     #一般用于判断一个命令是否为内置命令
 ```
 
 # 2.远程操作以及查看系统进程与端口号
