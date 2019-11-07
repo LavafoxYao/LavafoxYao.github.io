@@ -1,8 +1,8 @@
 ---
-title: C++ 之迭代器
+title: C++之迭代器
 date: 2019-10-08 12:09:47
 tags: C++
-categories: 编程语言
+categories: C++
 ---
 
 # 迭代器
@@ -145,7 +145,7 @@ public:
     CollectionIterator(const MyCollection<T> &c) : mc(c){}
     
     void first() override{}
-    void next() override(){}
+    void next() override{}
     bool isDone() const override{}
     T& current() override{}
 };
