@@ -1,5 +1,5 @@
 ---
-title: 剑指offer67-把字符串转换成整数
+title: 剑指offer-67.把字符串转换成整数
 date: 2020-02-29 15:23:23
 tags: 剑指offer
 categories: 题解
