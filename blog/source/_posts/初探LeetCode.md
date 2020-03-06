@@ -1,5 +1,5 @@
 ---
-title: LeetCode 一
+title: 初探LeetCode 
 date: 2019-09-12 17:11:19
 tags: LeetCode
 categories: 练习

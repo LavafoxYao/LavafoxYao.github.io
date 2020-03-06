@@ -5,6 +5,8 @@ tags: Linux
 categories: 环境搭建
 ---
 
+看了很多`blog`踩了很多坑，在此总结下。
+
 <!--more-->
 
 ## CentOS7
@@ -74,3 +76,141 @@ sudo vim apue.h
 ![](https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20190926122802.png)
 
 以上apue的环境就搭建完成了
+
+##  使用err_sys()等函数报未定义错误解决办法
+
+`err_sys`和`err_quit`等函数并不是系统调用和库函数，而是作者自己编写的函数，需要自建一个`.h`文件将下面的代码补充上，并在每次使用上述函数的时候包含该文件。
+例如：将改文件命名为`apueerror.h` ，将该头文件放在和`apue.h`同一个目录下（我的目录是/usr/include 。
+
+每次使用apue中的函数的时候最好都包含进来
+
+```C
+#include "apue.h"
+#include "apueerror.h"
+```
+
+
+
+#### `apueerror.h`包含的代码如下: 
+
+```C
+#include <errno.h> /* for definition of errno */
+#include <stdarg.h> /* ISO C variable aruments */
+
+static void err_doit(int, int, const char *, va_list);
+
+/*
+ * Nonfatal error related to a system call.
+ * Print a message and return.
+ */
+void
+err_ret(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(1, errno, fmt, ap);
+    va_end(ap);
+}
+
+
+/*
+ * Fatal error related to a system call.
+ * Print a message and terminate.
+ */
+void
+err_sys(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(1, errno, fmt, ap);
+    va_end(ap);
+    exit(1);
+}
+
+
+/*
+ * Fatal error unrelated to a system call.
+ * Error code passed as explict parameter.
+ * Print a message and terminate.
+ */
+void
+err_exit(int error, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(1, error, fmt, ap);
+    va_end(ap);
+    exit(1);
+}
+
+
+/*
+ * Fatal error related to a system call.
+ * Print a message, dump core, and terminate.
+ */
+void
+err_dump(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(1, errno, fmt, ap);
+    va_end(ap);
+    abort(); /* dump core and terminate */
+    exit(1); /* shouldn't get here */
+}
+
+
+/*
+ * Nonfatal error unrelated to a system call.
+ * Print a message and return.
+ */
+void
+err_msg(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(0, 0, fmt, ap);
+    va_end(ap);
+}
+
+
+/*
+ * Fatal error unrelated to a system call.
+ * Print a message and terminate.
+ */
+void
+err_quit(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    err_doit(0, 0, fmt, ap);
+    va_end(ap);
+    exit(1);
+}
+
+
+/*
+ * Print a message and return to caller.
+ * Caller specifies "errnoflag".
+ */
+static void
+err_doit(int errnoflag, int error, const char *fmt, va_list ap)
+{
+    char buf[MAXLINE];
+   vsnprintf(buf, MAXLINE, fmt, ap);
+   if (errnoflag)
+       snprintf(buf+strlen(buf), MAXLINE-strlen(buf), ": %s",
+         strerror(error));
+   strcat(buf, "\n");
+   fflush(stdout); /* in case stdout and stderr are the same */
+   fputs(buf, stderr);
+   fflush(NULL); /* flushes all stdio output streams */
+}
+```
+
