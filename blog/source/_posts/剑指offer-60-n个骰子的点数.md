@@ -1,7 +1,7 @@
 ---
 title: 剑指offer-60.n个骰子的点数
 date: 2020-03-05 11:53:38
-tags: 剑指offer
+tags:  ['剑指offer','DP']
 categories: 题解
 ---
 

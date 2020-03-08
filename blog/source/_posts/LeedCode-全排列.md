@@ -1,7 +1,7 @@
 ---
 title: LeedCode-全排列
 date: 2020-03-04 18:15:21
-tags: LeetCode
+tags: ['LeetCode', '回溯']
 categories: 题解
 ---
 
