@@ -5,7 +5,9 @@ tags: ['LeetCode', '二叉树']
 categories: 题解
 ---
 
-#### [145. 二叉树的后序遍历](https://leetcode-cn.com/problems/binary-tree-postorder-traversal/)
+[145. 二叉树的后序遍历](https://leetcode-cn.com/problems/binary-tree-postorder-traversal/)
+
+<!--more-->
 
 > 给定一个二叉树，返回它的 *后序* 遍历。
 >
@@ -28,7 +30,7 @@ categories: 题解
 
 2. 后序遍历的方式是`left->right->root`, 
 
-3. 我们可以把前序改为后序先`root->right->left`然后reverse下就可以得到后序遍历了.
+3. 我们可以把前序改为后序先`root->right->left`然后`reverse`下就可以得到后序遍历了.
 
 ```C++
 class Solution {
