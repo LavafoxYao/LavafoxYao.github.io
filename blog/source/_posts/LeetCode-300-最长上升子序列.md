@@ -24,7 +24,7 @@ categories: 题解
 
 
 
-思路:  动态规划
+### **思路**: ` 动态规划`
 
 子序列：不要求连续子序列，只要保证元素前后顺序一致即可； 
 
@@ -53,6 +53,29 @@ public:
         for (auto i : dp)
             ans = max(ans, i);
         return ans;
+    }
+};
+```
+
+### **思路**: `动态规划`+`贪心思想`
+
+维护一个结果数组，如果当前元素比结果数组的值都大的的话，就追加在结果数组后面（相当于递增序列长度加了1）；否则的话用当前元素覆盖掉第一个比它大的元素（这样做的话后续递增序列才有可能更长，即使并没有更长，这个覆盖操作也并没有副作用，当然这个覆盖操作可能会让最终的结果数组值并不是最终的递增序列值，这无所谓） 
+
+```C++
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        if (nums.empty())   return 0;
+        int size = nums.size();
+        // 结果数组
+        vector<int> vec;
+        for (int i = 0; i < size; ++i){
+            // 在vec中查找大于等于nums[i]的下标
+            int p = lower_bound(vec.begin(), vec.end(), nums[i]) - vec.begin();
+            if (p == vec.size())    vec.push_back(nums[i]);
+            else    vec[p] = nums[i];
+        }
+        return vec.size();
     }
 };
 ```
