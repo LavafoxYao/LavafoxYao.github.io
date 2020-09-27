@@ -1,5 +1,5 @@
 ---
-title: LeetCode38.外观数列
+title: LeetCode 38.外观数列
 date: 2020-07-12 21:26:41
 tags: LeetCode
 categories: 题解

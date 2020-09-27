@@ -1,5 +1,5 @@
 ---
-title: LeetCode31.下一个排列
+title: LeetCode 31.下一个排列
 date: 2020-07-12 22:58:10
 tags: LeetCode
 categories: 题解
