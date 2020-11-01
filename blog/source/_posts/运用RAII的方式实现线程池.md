@@ -1,9 +1,11 @@
 ---
 title: 运用RAII的方式实现线程池
-date: 2020-10-26 09:51:47
-tags: ['多线程', '网络编程', 'c++']
-categories: ['网络编程']
+date: 2020-10-29 09:59:51
+tags: ['多线程', '网络编程']
+categories: 网络编程
 ---
+
+
 
 最近这段时间在处理完实验室论文的事之后，都一直在学习如何去实现一个简易的`webserver`。今天来记录下学习到的重点知识。
 
@@ -159,6 +161,7 @@ public:
 
 private:
     // 条件变量一定要和mutex一起使用
+    // 注意这里使用的是引用
     MutexLock& m_mxt;
     pthread_cond_t m_cond;
 };
@@ -294,5 +297,31 @@ void ThreadPool::append_task(Task* tsk){
 }
 ```
 
-**所谓虚假唤醒,指的是即便我们没有 signal 相关的条件变量(即没有调用 `pthread_cond_signal`),等待(调用了` pthread_cond_wait`)的线程也可能被(虚假)唤醒,此时我们必须重新检查对应的标记值(以确认是否发生了(虚假)唤醒),又由于(虚假)唤醒可能会发生多次,所以我们最终需要使用循环来进行标记值检查.** 
+```C++
+// main.cpp
+#include "include/ThreadPool.h"
+#include <iostream>
+
+void print(int &i){
+    std::cout<<"print() ==>"<<pthread_self()<<"  "<<i++<<std::endl;
+}
+
+
+int main() {
+    int i = 0;
+    thread::ThreadPool pool(4);
+    while(1){
+        thread::Task* tsk = new thread::Task;
+        tsk->process = std::bind(print, std::ref(i));
+        pool.append_task(tsk);
+        sleep(1);
+    }
+    return 0;
+}
+
+```
+
+![](https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-31_15-17-47.png)
+
+**所谓虚假唤醒**,指的是即便我们没有 signal 相关的条件变量(即没有调用 `pthread_cond_signal`),等待(调用了` pthread_cond_wait`)的线程也可能被(虚假)唤醒,此时我们必须重新检查对应的标记值(以确认是否发生了(虚假)唤醒),又由于(虚假)唤醒可能会发生多次,所以我们最终需要使用循环来进行标记值检查. 
 
