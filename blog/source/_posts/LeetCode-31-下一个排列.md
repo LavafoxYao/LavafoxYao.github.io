@@ -44,26 +44,25 @@ public:
 class Solution {
 public:
     void nextPermutation(vector<int>& nums) {
-        // 思路: 1. 从后向前找第一个升序序列, 记住升序序列的第一个元素的位置
-        //       2. 从后向前找第一个大于升序序列的元素,将与其交换
-        //       3. 将交换点后的所有元素逆转
-        //       4. 若从后向前没有找到一个升序序列 说明整个序列为降序,只需逆转即可
+        // 1, 3, 2, 7, 4  ==> 1, 3, 4, 2, 7
+        // 从左边到右边 经历了什么? 
         int len = nums.size();
-        int pos = len - 2;          // 从倒数第二个元素开始找升序序列
-        for (; pos >= 0; --pos){
-            if (nums[pos] < nums[pos + 1])  break;      //找到升序
+        if (len < 2)    return ;
+        int i = len - 2;
+        // 1. 从右到左,找到第一个升序 由上面的例子可以只我们找的是 2, 7这一个升序
+        while (i >= 0 && nums[i] >= nums[i + 1])
+            i--;
+        // 2. 从右到左找第一个比2大的数,与2进行交换 ==> 由上面例子我们知道是 4
+        // 经过第二步就变成: 1, 3, 2, 7, 4  ==> 1, 3, 4, 7, 2
+        if (i >= 0){
+            int j = len - 1;
+            while (j > i && nums[j] <= nums[i])
+                j--;
+            swap(nums[i], nums[j]);
         }
-        if (pos < 0){
-            reverse(nums.begin(), nums.end());
-            return;
-        }
-        for (int i = len - 1; i >= 0; --i){
-            if (nums[i] > nums[pos]){
-                swap(nums[pos], nums[i]);               // 交换
-                reverse(nums.begin() + pos + 1, nums.end()); // 将升序点后面所有的元素逆置
-                return;
-            }
-        }
+        // 3. 把刚才找到的升序序列的终点(原来7的位置)到数组的终点reverse一下
+        // 1, 3, 4, 7, 2 ==> 1, 3, 4, 2, 7
+        reverse(nums.begin() + i + 1, nums.end());
     }
 };
 ```
