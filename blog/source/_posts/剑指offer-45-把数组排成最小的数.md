@@ -1,5 +1,5 @@
 ---
-title: 剑指offer-45.把数组排成最小的数
+title: 剑指Offer-45.把数组排成最小的数
 date: 2020-03-02 20:23:46
 tags: 剑指offer
 categories: 题解
