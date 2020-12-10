@@ -55,7 +55,7 @@ categories: 题解
 
 那么我们怎么算的每一位究竟有多少位1呢?
 ![](https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/12/tu2.png)
-**怎么确认定位的值呢?**
+**怎么确认低位的值呢?**
 
 分三种情况讨论
 
