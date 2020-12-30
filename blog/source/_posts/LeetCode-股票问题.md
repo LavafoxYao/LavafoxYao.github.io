@@ -253,7 +253,12 @@ public:
         if (k >= size / 2)  return helper(prices);
         
         vector<vector<vector<int>>> dp(size, vector<vector<int>>(k, vector<int>(2,0)));
+        // 你可能有疑问 为什么不是只有dp[0][0][0] = -prices[0]就好了? 为什么把没有进行的交易都要初始化?
         for (int j = 0; j < k; ++j){
+            /* 
+            * 为了防止下面式子   dp[i][0][0] = max(dp[i - 1][0][0], -prices[i]);
+            * 0大于负数, 再进行其他交易的时候挑选不符合题意的股票,所以要把所有交易都初始化
+            */
             dp[0][j][0] = -prices[0];
             dp[0][j][1] = 0;
         }
