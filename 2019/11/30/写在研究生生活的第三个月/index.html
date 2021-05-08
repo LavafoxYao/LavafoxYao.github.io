@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="成长之谈,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Winter Is Coming 这温度和我对生活的热情一样，随着时间流逝已经失去了余温。对研究生两点一线的生活已渐渐习以为常，自己也越来越佛系。 恰巧今天是十一月的尾巴，趁着这个时间点对上个月做一点小小的总结，估计下次写这种感受的博文可能就是在寒假收假后了。 从开学到现在这三个月里，除了正常的功课还有跟着老师的研究方向学机会网络，自己私下也看了不少书，比如这些天在看的《深入理解计算机系统》。在看">
+<meta name="keywords" content="成长之谈">
+<meta property="og:type" content="article">
+<meta property="og:title" content="写在研究生生活的第三个月">
+<meta property="og:url" content="http://yoursite.com/2019/11/30/写在研究生生活的第三个月/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="Winter Is Coming 这温度和我对生活的热情一样，随着时间流逝已经失去了余温。对研究生两点一线的生活已渐渐习以为常，自己也越来越佛系。 恰巧今天是十一月的尾巴，趁着这个时间点对上个月做一点小小的总结，估计下次写这种感受的博文可能就是在寒假收假后了。 从开学到现在这三个月里，除了正常的功课还有跟着老师的研究方向学机会网络，自己私下也看了不少书，比如这些天在看的《深入理解计算机系统》。在看">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.132Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="写在研究生生活的第三个月">
+<meta name="twitter:description" content="Winter Is Coming 这温度和我对生活的热情一样，随着时间流逝已经失去了余温。对研究生两点一线的生活已渐渐习以为常，自己也越来越佛系。 恰巧今天是十一月的尾巴，趁着这个时间点对上个月做一点小小的总结，估计下次写这种感受的博文可能就是在寒假收假后了。 从开学到现在这三个月里，除了正常的功课还有跟着老师的研究方向学机会网络，自己私下也看了不少书，比如这些天在看的《深入理解计算机系统》。在看">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/30/写在研究生生活的第三个月/">
+
+
+
+
+
+  <title>写在研究生生活的第三个月 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/30/写在研究生生活的第三个月/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">写在研究生生活的第三个月</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-30T17:08:08+08:00">
+                2019-11-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/伴呜说/" itemprop="url" rel="index">
+                    <span itemprop="name">伴呜说</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>Winter Is Coming</em></p>
+<p>这温度和我对生活的热情一样，随着时间流逝已经失去了余温。对研究生两点一线的生活已渐渐习以为常，自己也越来越佛系。</p>
+<p>恰巧今天是十一月的尾巴，趁着这个时间点对上个月做一点小小的总结，估计下次写这种感受的博文可能就是在寒假收假后了。</p>
+<p>从开学到现在这三个月里，除了正常的功课还有跟着老师的研究方向学机会网络，自己私下也看了不少书，比如这些天在看的《深入理解计算机系统》。在看到第三章，一大堆陌生的X86汇编指令，让我失去学习的兴趣。本科期间我也确实接触过一段时间的汇编，现在捡起来让我觉得索然无味（借口借口都是借口）。</p>
+<p>昨天在豆瓣也看到这么一段话，也和我这段时间看书的心态和感受类似。</p>
+<blockquote>
+<p>这篇书评主要想写给自己看。还记得当时翻开这本书之前，对操作系统的满心敬畏，心中只想赶快开始去学习其中的知识，期待赶快明白操作系统到底是怎么回事，操作系统到底为我们做了些什么。现在看完了这本书，并没有像想象中那样对操作系统了然于胸。反而是徒增了更多困惑，知道了进程线程，知道了虚拟内存，知道了文件系统，但是却发现随便的一个话题都能找出非常多的论文，可能有人终其一生都只是研究了个进程线程而已，可能有人终其一生都参不透这进程线程。</p>
+<p>不同于刚开始读此书的兴奋和获取新知识的窃喜，也不同于在读不懂这本书中某些内容时的烦躁和跳过晦涩部分的不安，看完了这本书之后，感觉自己的心情是很微妙的。可以说是一种释然，毕竟我又有了一些进步，可以开始我的下一步计划了，但是又有一些懊悔，那些被我跳过的部分，应该都是前人研究留下的精华吧。我甚至都有一个念头，想把这本书从头再读一遍，但是终究还是没能开始。</p>
+<p>在写下这篇书评之前，我时常会反思自己，自己的学习方式需不需要调整，怎样才能更快更加高效地获取知识。每天任务驱动，计划驱动的读书方式让我在很长一段时间内都很充实，也学到了不少的知识。但是当我不能实现自己今天定下的计划时，我开始失落，认为是因为自己没有用心学习才导致计划没有被完成。其实我现在仔细想想并不是我没用心，而是我学习的任务开始变难了，而我却还想保持以前的速度。由于这种进度要求带来的压力，我发现我开始主动降低了自己读书的质量（这真是讽刺，我发现这种现象在作为业务员的程序员中广泛存在，而我一开始就立志自己不要迷失在业务代码中，立志要有自己的想法，不因为进度的压力去降低代码的质量）</p>
+<p>这种赶进度式的读书带来了表面效率的提升：我确实按照进度读完了书，但是我却并没有得到我本应在这本书中获得的知识。所以实质上来说，我浪费了自己的时间在因为看不懂某些细节而慌张，因为跳过这些细节而不安。而本来我的时间本来应该放在思考这些细节，弄懂这些细节和享受弄懂这些知识之后的快乐上的。</p>
+<p>时间的浪费如果只是一个弊端的话，另一个更大的问题是，赶进度让我的成就感大打折扣，甚至我会觉得有一种挫败感。当初我选择做一个程序员，就是因为对编程的热爱，和对于计算机科学的热爱。我买下的每一本书都寄托着我的期望，希望我能通过这些书对计算机这门科学有更深的了解，希望能够写出更加优秀的代码。但是现在我发现我在为了一个“看完xx本专业书籍”的虚无缥缈的目标逼迫着自己前进。这与我的初衷背道而驰。</p>
+<p>了解到这些，也是对自己今后的规划有了新的指示。计算机科学本来就不是刻苦奋斗两三年之后就能吃老本的学科，我也没有必要赶着在工作之前搞懂一切。一直都在赶路只会一直错过，静下心来思考才能真正学到知识。况且，我觉得带着热情，带着脑子去看书，没准才是实际看得最快的方式。</p>
+<p>  以此篇书评致自己，我想要成为一名顶尖的程序员。</p>
+</blockquote>
+<p>确实学习的曲线并不是一条斜率为0的直线，而很大可能在某个阶段是很陡峭的，可能我们在当下的时间节点并不能完全理解某块知识，我个人觉得是没有问题的。一个或几个小的知识点实在看书看不懂，可以先通过工具来帮助自己更好的理解，比如用Google查找相应博客和维基百科或查找相对应的讲解的课，跳到该章节进行学习。很多书也只是建立了一个大致的体系，比如《Linux内核设计与实现》我看完之后的感受就是对内核的工作方式和实现方式有了一个大致的了解，当然有很多源码部分看不太懂，但是我相信在我继续学习的过程中，当我了解更多关于系统更细节的知识再回过头来学习它肯定又是一种感受。</p>
+<p>还有一点也是自学过程容易使人倍感挫败，那就是遗忘。私以为学了很多忘了就让它忘了吧，很多东西你觉得你忘了，再通过反复学习的过程中已经建立起了一种意识，这个所谓的意识就是你自己对计算机的理解。当然如果要去面试的话，重新学习重点背诵是很有必要的。</p>
+<p>学习从来不是集中填鸭的过程，而是要花一辈子时间去打磨自己的专项技能。当然我说的给人感觉很美好，普通的我们是以后在普通的岗位做着普通的业务，诗与远方和我们似乎无关。我的理解是心存希望，才有活下去的动力呀。</p>
+<p>在某篇文章上看到一句话很喜欢，与君共勉：“每个人都有迷茫和不确定，付出足够的时间和耐心，随机过程总会收敛到和付出相对的稳态。”</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/成长之谈/" rel="tag"># 成长之谈</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/26/LU分解/" rel="next" title="LU分解">
+                <i class="fa fa-chevron-left"></i> LU分解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/31/2019年度总结/" rel="prev" title="2019年度总结">
+                2019年度总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

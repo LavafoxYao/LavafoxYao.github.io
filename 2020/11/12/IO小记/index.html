@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="网络编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="记录下关于网络IO的一些容易混乱的知识点。">
+<meta name="keywords" content="网络编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO小记">
+<meta property="og:url" content="http://yoursite.com/2020/11/12/IO小记/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="记录下关于网络IO的一些容易混乱的知识点。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/%E7%BD%91%E7%BB%9CIO%E7%9A%84%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-12_21-53-36.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-12_22-04-19.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.109Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IO小记">
+<meta name="twitter:description" content="记录下关于网络IO的一些容易混乱的知识点。">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/%E7%BD%91%E7%BB%9CIO%E7%9A%84%E8%BF%87%E7%A8%8B.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/12/IO小记/">
+
+
+
+
+
+  <title>IO小记 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/12/IO小记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IO小记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-12T21:04:33+08:00">
+                2020-11-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>记录下关于网络IO的一些容易混乱的知识点。</p>
+<a id="more"></a>
+
+<h3 id="网络IO"><a href="#网络IO" class="headerlink" title="网络IO"></a>网络IO</h3><p>在Linux系统中，有这样一句话，叫做『万物皆文件』，也就是说，所有东西都可以抽象成『open –&gt; write/read –&gt; close』模式来操作。 故Linux的网络操作中也可以将从网络中读取/发送数据当成文件处理，只不过这个文件比较特殊数据来源于网卡。因此对于网络的操作也是可以通过IO去描述的。</p>
+<p>为了方便不同的终端进行通信，网络协议栈抽象出了<code>socket</code>，通过对<code>socket</code>文件描述符的操作来实现网络传输。</p>
+<h3 id="IO的基本原理"><a href="#IO的基本原理" class="headerlink" title="IO的基本原理"></a>IO的基本原理</h3><p>IO读写分为read和write，read调用过程如下（write同理）:</p>
+<ol>
+<li>进程发起读文件请求。</li>
+<li>内核通过查找进程文件符表，定位到内核已经打开的文件集上的文件信息，从而找到文件的<code>inode</code></li>
+<li>再通过<code>inode</code>查找需要请求的页面是否已经存在于页缓存（内核中）中。若存在则直接返回这片文件页的内容。若不存在（缺页中断），则通过<code>inode</code>定位到文件磁盘地址，将数据从磁盘复制到页缓存中，之后再次发起读页面的过程，进而将<strong>页缓存中的数据发给用户进程</strong>。</li>
+</ol>
+<p>如上：我们可以看到read/write都不是简单的将数据从用户进程写入到磁盘(read是从磁盘读到用户进程的内存)，在它们中间还有一个缓冲区，这个缓冲区包括<strong>内核缓冲区</strong>与<strong>用户进程缓冲区</strong>。同理，对于网络传输来说也存在着这个中间缓冲区，具体如下图。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/%E7%BD%91%E7%BB%9CIO%E7%9A%84%E8%BF%87%E7%A8%8B.png" alt></p>
+<p>因为所有socket的函数，都是系统调用，最终都是由内核去做事情，这里就涉及到用户态与内核态的问题。一般来讲，在Linux中每一个进程都有两个栈，一个内核栈一个用户栈，用户栈就是常规意义上的栈，而内核栈就是内核代码运行使用的栈。在网络IO的过程中，需要注意的地方就在于内核使用的内存跟用户使用的内存是相互独立的，两者之间没有共享内存的存在，所以，在我们的read方法的时候，内核其实是做了两步操作:</p>
+<ol>
+<li><strong>内核缓冲区从网卡读取数据，为用户进程准备好read的数据</strong></li>
+<li><strong>把数据从内核中拷贝到用户可以访问的内存中。</strong></li>
+</ol>
+<h3 id="阻塞IO与非阻塞IO"><a href="#阻塞IO与非阻塞IO" class="headerlink" title="阻塞IO与非阻塞IO"></a>阻塞IO与非阻塞IO</h3><h4 id="阻塞式IO"><a href="#阻塞式IO" class="headerlink" title="阻塞式IO"></a>阻塞式IO</h4><p>我们说的”阻塞”是指进程在发起一个系统调用后，由于该系统调用的操作<strong>不能立即完成，需要等待一段时间，</strong>于是内核将进程挂起为等待状态，以确保它不会被调度执行，从而节约CPU的资源。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-12_21-53-36.png" alt></p>
+<p>上图中，当用户进程调用了<code>recvfrom</code>这个系统调用以后，<code>kernel</code>就开始<strong>IO的第一个阶段：准备数据(等待足够的数据到达)，这个过程是需要等待的</strong>，也就是说数据从网卡拷贝到内核缓冲区是需要一个过程的。而在用户进程这边，整个过程都会被阻塞住。当<code>kernel</code>一直等到数据准备完成后，<strong>开始第二个阶段：它就会从<code>kernel</code>拷贝到用户进程的缓存中（这个过程在阻塞IO中也是阻塞的），然后用户进程解除阻塞状态</strong>，重新运行。（上图红线部分为阻塞状态）</p>
+<p>我们需要注意到，在阻塞当前进程时，CPU转而去执行其他进程，因此阻塞并不意味着整个操作系统都被阻塞。由于在当前进程被阻塞时，CPU转而去执行其他进程了，所以CPU的利用率较高。</p>
+<p>这种模型适合<strong>并发量较小的网络应用开发</strong>。不适合并发量大的应用。因为每个请求IO都需要一个进程（线程）去处理，所以得为每个请求分配一个处理进程（线程）以及时响应，系统的开销比较大。</p>
+<h4 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h4><p>我们说的非阻塞是指进程在发起一个系统调用后立刻返回返回，应用进程可以继续执行，等系统调用结束后由系统通知调用者，调用已完成。 所以，非阻塞IO可以空闲出很多用户线程的时间来处理别的事情。 </p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-12_22-04-19.png" alt></p>
+<p>如上图所示，当用户进程发出<code>recvfrom</code>操作时，如果<code>kernel</code>中的数据还没有准备好，那么它并不会阻塞用户进程，而是返回一个error。从用户进程的角度讲，它发起一个<code>recvfrom</code>操作以后，并不需要等待。而是马上得到一个结果，用户知道数据并没有准备好，于是它可以再次发送<code>recvfrom</code>操作。一旦<code>kernel</code>中的数据准备好了，并且再次收到用户进程的系统调用，那么它将数据拷贝至用户内存，然后返回。(特点是需要用户进程不断的主动进行轮询)</p>
+<h5 id="阻塞式IO与非阻塞式IO的区别"><a href="#阻塞式IO与非阻塞式IO的区别" class="headerlink" title="阻塞式IO与非阻塞式IO的区别"></a>阻塞式IO与非阻塞式IO的区别</h5><p>两者区别就在当阻塞IO调用<code>recvfrom</code>后，<strong>在第一步和第二步用户进程都会被阻塞</strong>。<strong>而非阻塞IO，非阻塞指的是第一步，也就是从内核准备<code>recvfrom</code>需要的数据时不会阻塞用户进程，会直接返回，而第二步拷贝数据跟阻塞式IO是一样的，都会阻塞</strong>。通常来说，第二步的阻塞并非性能的瓶颈，因为从内核拷贝数据到用户进程是非常快的，网络通信最大的瓶颈在于网络之间传输数据的过程，因为这个过程需要网络协议来通过互联网传输数据。</p>
+<p>虽然，非阻塞IO在第一步不阻塞用户进程，但是为了得知内核的数据是否已经准备好，用户进程（线程）需要不断的执行轮询内核来获取数据准备的情况。由于轮询的存在使得这种模型CPU的利用率比较低。为了优化非阻塞式IO轮询的机制，IO多路复用的概念就被提出来了。</p>
+<h3 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h3><p>IO多路复用是一种同步IO模型，实现了一个线程可以见识多个文件句柄。一旦某个文件出现就绪，就能够通知程序进行相应的读写操作。没有文件句柄就绪时就阻塞应用程序，交出CPU。</p>
+<p>多路是指的网络连接，复用是指的同一线程。</p>
+<p>一般地，IO多路复用都依赖于一个时间多路分离器（如epoll_wait 返回的就绪事件，通过if else分开不同的事件）。分离器的对象来自事件源IO事件分离出来，并分发到对应的read/write事件处理器。开发者预先注册需要处理的时间以及时间处理器（回调函数），事件分离器负责将请求传递给事件处理器。</p>
+<p>两种高效的事件处理模式:</p>
+<ol>
+<li>Reactor: 主要应用epoll  ==&gt; 同步IO</li>
+<li>Proactor:主要应用iocp  ==&gt; 异步IO</li>
+</ol>
+<h4 id="Reactor"><a href="#Reactor" class="headerlink" title="Reactor"></a>Reactor</h4><p>Reactor要求主线程只负责监听文件描述符上是否有事件发生，有的话就通知给工作线程。除此之外主线程不做任何实质性的工作。<strong>读写数据</strong>，接受新的链接，以及处理客户请求均在工作线程中完成。</p>
+<p><code>epoll</code>的工作方式就是典型的Reactor模式。</p>
+<ol>
+<li>主线程往<code>epoll</code>内核事件表中注册socket上的读就绪（其他也可以）事件。</li>
+<li>主线程调用<code>epoll_wait</code>等待socket上有数据可读。</li>
+<li>当socket上有数据可读时，epoll通知主线程。主线程则将socket可读事件放入到请求队列。</li>
+<li>睡眠在请求队列上的某个工作线程被唤醒，<strong>它从socket中读取数据</strong>，并且处理客户请求。</li>
+</ol>
+<p>Reactor模式，本质上就是当IO事件触发时，通知我们<strong>主动去读取</strong>，也就是需要我们主动将socket中的数据读取到应用进程，再处理。</p>
+<h4 id="Proactor"><a href="#Proactor" class="headerlink" title="Proactor"></a>Proactor</h4><p>与Reactor不同的是，Proactor模式将所有<strong>IO操作都交给主线程和内核来处理</strong>，工作线程仅仅负责业务逻辑。</p>
+<p>使用异步IO模型（以<code>aio_read</code>和<code>aio_write</code>为例）<code>Proactor</code>的工作模式是如下。</p>
+<ol>
+<li>主线程调用<code>aio_read</code>函数向内核注册socket上的读完成事件，并告诉内核用户读缓冲区的位置，以及读操作完成时如何通知应用程序(这里使用的是信号)。</li>
+<li>主线程继续处理其他逻辑。</li>
+<li>当socket上的数据被读入到用户缓冲区后，内核将向应用程序发送一个信号，以通知应用数据已经可用。</li>
+<li>应用程序预先定义好的信号处理函数选择一个工作线程来处理客户请求（不用工作线程读取数据）。</li>
+</ol>
+<p>在Proatcor模式中，<strong>我们需要指定一个应用进程内的buffer，交给系统，当有数据包到达时，则写入到这个buffer中并通知我们收了多少字节。</strong></p>
+<p>参考链接:</p>
+<p><a href="http://gaocegege.com/Blog/network/select" target="_blank" rel="noopener">非阻塞IO学习分享</a></p>
+<p>Linux高性能服务器编程</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络编程/" rel="tag"># 网络编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/06/重学计算机网络/" rel="next" title="重学计算机网络">
+                <i class="fa fa-chevron-left"></i> 重学计算机网络
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/14/常见排序汇总/" rel="prev" title="常见排序汇总">
+                常见排序汇总 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#网络IO"><span class="nav-text">网络IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO的基本原理"><span class="nav-text">IO的基本原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞IO与非阻塞IO"><span class="nav-text">阻塞IO与非阻塞IO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#阻塞式IO"><span class="nav-text">阻塞式IO</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#非阻塞IO"><span class="nav-text">非阻塞IO</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#阻塞式IO与非阻塞式IO的区别"><span class="nav-text">阻塞式IO与非阻塞式IO的区别</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO多路复用"><span class="nav-text">IO多路复用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Reactor"><span class="nav-text">Reactor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Proactor"><span class="nav-text">Proactor</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

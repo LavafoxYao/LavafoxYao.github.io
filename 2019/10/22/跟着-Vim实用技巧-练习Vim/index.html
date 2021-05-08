@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本着学习apue想练习下Vim的使用方法,越学越怀疑自己是不是走偏了. 这本书确实是手把手教你但是,技巧实在太多了,现在自己用起Vim的心理负担越来越重,很多技巧看过不重复练习真的用不上. 所以我就看了前五章,实在是学不下去了…">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟着&lt;Vim实用技巧&gt;练习Vim">
+<meta property="og:url" content="http://yoursite.com/2019/10/22/跟着-Vim实用技巧-练习Vim/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="本着学习apue想练习下Vim的使用方法,越学越怀疑自己是不是走偏了. 这本书确实是手把手教你但是,技巧实在太多了,现在自己用起Vim的心理负担越来越重,很多技巧看过不重复练习真的用不上. 所以我就看了前五章,实在是学不下去了…">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/Vim%E4%B9%8B.%E5%91%BD%E4%BB%A4.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E6%8A%80%E6%B3%952.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E6%8A%80%E6%B3%955.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/daw.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/VIM%E7%9A%84%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%91%BD%E4%BB%A4.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/VIM%E6%8F%92%E5%85%A5%E6%A8%A1%E5%BC%8F%E4%B8%AD%E7%9A%84%E8%AE%A1%E7%AE%97.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/Vim%E6%9B%BF%E6%8D%A2%E5%B7%B2%E6%9C%89%E6%96%87%E6%9C%AC.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E4%B9%8B%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F1.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E4%B9%8B%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F2.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.142Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟着&lt;Vim实用技巧&gt;练习Vim">
+<meta name="twitter:description" content="本着学习apue想练习下Vim的使用方法,越学越怀疑自己是不是走偏了. 这本书确实是手把手教你但是,技巧实在太多了,现在自己用起Vim的心理负担越来越重,很多技巧看过不重复练习真的用不上. 所以我就看了前五章,实在是学不下去了…">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/Vim%E4%B9%8B.%E5%91%BD%E4%BB%A4.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/22/跟着-Vim实用技巧-练习Vim/">
+
+
+
+
+
+  <title>跟着<vim实用技巧>练习Vim | Wuyooyoo's Blog</vim实用技巧></title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/跟着-Vim实用技巧-练习Vim/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">跟着<vim实用技巧>练习Vim</vim实用技巧></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-22T10:32:59+08:00">
+                2019-10-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/生产工具及环境的折腾/" itemprop="url" rel="index">
+                    <span itemprop="name">生产工具及环境的折腾</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本着学习apue想练习下Vim的使用方法,越学越怀疑自己是不是走偏了.</p>
+<p>这本书确实是手把手教你但是,技巧实在太多了,现在自己用起Vim的心理负担越来越重,很多技巧看过不重复练习真的用不上.</p>
+<p>所以我就看了前五章,实在是学不下去了…</p>
+<a id="more"></a>
+<h1 id="Vim实用技巧"><a href="#Vim实用技巧" class="headerlink" title="Vim实用技巧"></a>Vim实用技巧</h1><h5 id="Vim的配置文件"><a href="#Vim的配置文件" class="headerlink" title="Vim的配置文件"></a>Vim的配置文件</h5><p>系统级配置文件目录:/etc/vim/vimrc<br>用户级配置文件目录:~/.vim/vimrc</p>
+<h5 id="Vim分屏"><a href="#Vim分屏" class="headerlink" title="Vim分屏"></a>Vim分屏</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">命令模式下</span></span><br><span class="line">sp   		 //横屏</span><br><span class="line">vsp 		 //竖屏</span><br><span class="line">Crtl-w       //切屏</span><br><span class="line">//切换到命令模式下</span><br><span class="line">qall         //不保存</span><br><span class="line">wall         //全部保存退出</span><br></pre></td></tr></table></figure>
+
+<h3 id="第一章-Vim解决问题的方式"><a href="#第一章-Vim解决问题的方式" class="headerlink" title="第一章 Vim解决问题的方式"></a>第一章 Vim解决问题的方式</h3><p>Vim对重复性的操作进行了优化.它之所以能高效地重复,是因为它会记录我们最近的操作,让我们用一次按键就能重复上次的修改.</p>
+<h4 id="技巧1-命令"><a href="#技巧1-命令" class="headerlink" title="技巧1 . 命令"></a>技巧1 . 命令</h4><blockquote>
+<p>. 命令可以让我们重复上次的修改(一次修改的单位可以是字符、整行，甚至是整个文件)</p>
+</blockquote>
+<p><strong>&gt;G</strong>  命令会增加当前行到文档末尾处的缩进层级,如果我们在此命令后使用 . 命令,那么”重复上次修改”会让VIM增加当前行到文档末尾的缩进层级.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/Vim%E4%B9%8B.%E5%91%BD%E4%BB%A4.png" alt></p>
+<p><strong>.命令是一个微型的宏</strong></p>
+<h4 id="技巧2-减少无关操作"><a href="#技巧2-减少无关操作" class="headerlink" title="技巧2 减少无关操作"></a>技巧2 减少无关操作</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Line one</span><br><span class="line">Line two</span><br><span class="line">Line tree</span><br></pre></td></tr></table></figure>
+
+<p>我们想在每行的结尾添加一个分号.先将光标移动到行位,然后切换插入模式进行修改.</p>
+<p><strong>$</strong> 命令可以完成光标的移动操作</p>
+<p><strong>a</strong> 切换至插入模式,键入 <strong>;</strong></p>
+<p>由于 <strong>.</strong> 命令可以重复上次的修改,我们只需要执行 <strong>j$.</strong></p>
+<p><strong>.</strong> 命令在这里相当于(<strong>a</strong>;<esc>)</esc></p>
+<p><strong>a</strong> 命令是在当前光标之后添加内容,而 <strong>A</strong> 命令则是在当前行的结尾添加内容.换句话说就是把 <strong>$a</strong>封装成了一键操作.这样我们就通过 <strong>A</strong> 来代替 <strong>$a</strong> 大大提升了 <strong>.</strong> 效率. </p>
+<h4 id="技巧3-以退为进"><a href="#技巧3-以退为进" class="headerlink" title="技巧3 以退为进"></a>技巧3 以退为进</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = <span class="string">"method("</span>+argument1+<span class="string">","</span>+argument2+<span class="string">")"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这样变量名之间没有空格看起来并不美观,我们可以在”+”前后各添加一个空格,让肉眼更容易识别:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = <span class="string">"method("</span> + argument1 + <span class="string">","</span>+argument2+ <span class="string">")"</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E6%8A%80%E6%B3%952.png" alt></p>
+<p><strong>s</strong> 命令把删除光标下的字符和进入插入模式合二为一.<br><strong>;</strong> 命令会重复查找上次<strong>f</strong>命令所查找的字符</p>
+<h4 id="技巧4-执行、重复、回退"><a href="#技巧4-执行、重复、回退" class="headerlink" title="技巧4 执行、重复、回退"></a>技巧4 执行、重复、回退</h4><p><strong>@:</strong> 可以用来重复任意Ex命令<br><strong>&amp;</strong> 来重复 <strong>substitute</strong>命令</p>
+<p>对于 <strong>.</strong> 命令而言,我们可以按 <strong>u</strong> 键撤销上次的修改.<br>若使用<strong>f{cahr}</strong>,不小心多按了 <strong>;</strong> 键,我们可以按<strong>,</strong>撤回</p>
+<h4 id="技巧5-查找并手动替换"><a href="#技巧5-查找并手动替换" class="headerlink" title="技巧5 查找并手动替换"></a>技巧5 查找并手动替换</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">...We're waiting for content before the site can go live...</span><br><span class="line">...If you are content with this,let's go ahead with it...</span><br><span class="line">...We'll launch as soon as we have the content...</span><br></pre></td></tr></table></figure>
+
+<p>若我们想将”copy”替换成”content”,<br>可以使用==&gt;:%s /conten/copy/g<br>全部替换成copy</p>
+<p>单我们想单一的修改呢?<br>我们可以把光标移动到待选的单词上,然后按 * 键.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E6%8A%80%E6%B3%955.png" alt></p>
+<p>星号 * 命令有两个功能:1.光标会调到下一个匹配项上 2.所有出现这个词的地方都会被高亮显示出来</p>
+<p><strong>n</strong>键可以跳到下一个匹配项</p>
+<p><strong>cw</strong>命令会删除从光标位置到单词结尾间的字符,并进入插入模式</p>
+<p>取消高亮部分可以使用==&gt;:noh</p>
+<h4 id="技巧6-结识-的范式-略"><a href="#技巧6-结识-的范式-略" class="headerlink" title="技巧6 结识 . 的范式 (略)"></a>技巧6 结识 . 的范式 (略)</h4><h2 id="第一部分-模式"><a href="#第一部分-模式" class="headerlink" title="第一部分 模式"></a>第一部分 模式</h2><h3 id="第二章-普通模式"><a href="#第二章-普通模式" class="headerlink" title="第二章 普通模式"></a>第二章 普通模式</h3><h4 id="技巧7-停顿时请移开画笔-略"><a href="#技巧7-停顿时请移开画笔-略" class="headerlink" title="技巧7 停顿时请移开画笔 (略)"></a>技巧7 停顿时请移开画笔 (略)</h4><h4 id="技巧8-把撤销单元切成块"><a href="#技巧8-把撤销单元切成块" class="headerlink" title="技巧8 把撤销单元切成块"></a>技巧8 把撤销单元切成块</h4><p><strong>u</strong> 键会触发撤销命令,它会撤销最新的修改.<br>在Vim中,我们自己可以控制撤销命令的粒度.从进入插入模式开始,知道返回普通模式为止,在此期间输入或删除的任何内容都被当成一次修改.<br><strong><cr></cr></strong> 换行 (按回车键,也写作<enter>)</enter></p>
+<h4 id="技巧9-构造可重复的修改"><a href="#技巧9-构造可重复的修改" class="headerlink" title="技巧9 构造可重复的修改"></a>技巧9 构造可重复的修改</h4><p>删除单词nigh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The end is nigh</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/daw.png" alt><br><strong>aw</strong> 文本对象<br><strong>*daw</strong> 命令可以解毒为”delete a word”<br>这个操作不仅仅删除了该单词,而且它还会删除一个空格.<br><strong>*daw</strong> 可以发挥 <strong>.</strong> 命令的最大威力</p>
+<h4 id="技巧10-用次数做简单的算术运算"><a href="#技巧10-用次数做简单的算术运算" class="headerlink" title="技巧10 用次数做简单的算术运算"></a>技巧10 用次数做简单的算术运算</h4><p><strong><c-a></c-a></strong> (ctrl-a)执行+1操作<br><strong><c-x></c-x></strong> 执行-1操作</p>
+<p>在不带次数执行时,它们会逐个的加减<br>但如果带一个次数前缀,那么就可以用它们加减任意整数</p>
+<p><strong>10<c-a></c-a></strong>就会把它+10</p>
+<h4 id="技巧11-能够重复-就别用次数"><a href="#技巧11-能够重复-就别用次数" class="headerlink" title="技巧11 能够重复,就别用次数"></a>技巧11 能够重复,就别用次数</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Delete more than one word</span><br></pre></td></tr></table></figure>
+
+<p>将这段文字改为”Delete one word”,也就是要删除两个单词<br>先输入 <strong>fm</strong> ,光标找到m<br>然后 <strong>d2w</strong> 和 <strong>2dw</strong> 都可以<br>使用 <strong>d2w</strong> ,我们先调用删除命令,然后以 <strong>2w</strong> 作为动作命令,我们可以把它解读为”删除两个单词”;然而 <strong>2dw</strong><br>做的相反,”做两次删除单词的操作”</p>
+<h4 id="技巧12-双剑合璧-天下无敌"><a href="#技巧12-双剑合璧-天下无敌" class="headerlink" title="技巧12 双剑合璧,天下无敌"></a>技巧12 双剑合璧,天下无敌</h4><p>Vim的强大在很大程度上源自于操作符与动作命令相结合.</p>
+<h5 id="操作符-动作命令-操作"><a href="#操作符-动作命令-操作" class="headerlink" title="操作符 + 动作命令 = 操作"></a>操作符 + 动作命令 = 操作</h5><p><strong>d{motion}</strong> 命令</p>
+<p><strong>dl</strong> 对一个字符</p>
+<p><strong>daw</strong> 对一个完整的单词</p>
+<p><strong>dap</strong> 对一个完整的段落</p>
+<p><strong>g~</strong> <strong>gu</strong> 和 <strong>gU</strong> 命令要用两次按键来调用,可以把上述命令中的 <strong>g</strong> 当做是一个前缀字符,用来改变其后面的按键行为.</p>
+<p><strong>gUaw</strong> 可以把当前单词转化为大写形式.<br><strong>guaw</strong> 可以把当前单词转化为小写形式.</p>
+<p>作用于段落的 <strong>ap</strong> 动作命令 </p>
+<p>用 <strong>dap</strong> 删除整个段落,用 <strong>gUap</strong> 把整段文字转化成大写.</p>
+<p><strong>Vim的语法只有一条额外的规则,即当一个操作符命令被连续调用两次时,它会作用于当前行.</strong></p>
+<blockquote>
+<p>所以 <strong>dd</strong> 删除当前行, <strong>&gt;&gt;</strong>缩进当前行</p>
+</blockquote>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/VIM%E7%9A%84%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%91%BD%E4%BB%A4.png" alt></p>
+<h3 id="第三章-插入模式"><a href="#第三章-插入模式" class="headerlink" title="第三章 插入模式"></a>第三章 插入模式</h3><p>大部分的Vim命令都在非插入模式中执行,不过有些功能在插入模式中会更好实现些.</p>
+<h4 id="技巧13-在插入模式中可即时更正错误"><a href="#技巧13-在插入模式中可即时更正错误" class="headerlink" title="技巧13 在插入模式中可即时更正错误"></a>技巧13 在插入模式中可即时更正错误</h4><blockquote>
+<p>如果在插入模式下撰写文本时出错,我们立刻对它进行更正,而无需切换模式.要迅速更正错误,除了用退格键外,我们还可以用插入模式中的其他一些命令.</p>
+</blockquote>
+<p>在输入错误时,我们可以用退格键删除错误的文本,然后再输入正确的内容.如果出错的地方靠近单词结尾,这或许是最快的修正方式.但是如果出错的位置在单词开头呢?</p>
+<table>
+<thead>
+<tr>
+<th align="left">按键操作</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">&lt; C-h &gt;</td>
+<td align="left">删除前一个字符(同退格键)</td>
+</tr>
+<tr>
+<td align="left">&lt; C-w &gt;</td>
+<td align="left">删除前一个单词</td>
+</tr>
+<tr>
+<td align="left">&lt; C-u &gt;</td>
+<td align="left">删至行首</td>
+</tr>
+</tbody></table>
+<h4 id="技巧14-返回普通模式"><a href="#技巧14-返回普通模式" class="headerlink" title="技巧14 返回普通模式"></a>技巧14 返回普通模式</h4><blockquote>
+<p>插入模式只专注于做一件事,那就是输入文字,而普通模式确实我们大部分时间所所用的模式,因此能在两种模式间切换是很重要的.</p>
+</blockquote>
+<p>切换回到普通模式的经典方式是使用 <strong><esc></esc></strong> 键,但键盘上这个键距离似乎有点远.作为代替,我们可以使用 <strong>&lt;C-[&gt;</strong> ,它的效果与 <strong><esc></esc></strong> 完全相同.</p>
+<table>
+<thead>
+<tr>
+<th align="left">按键操作</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">&lt;  Esc &gt;</td>
+<td align="left">切换到普通模式</td>
+</tr>
+<tr>
+<td align="left">&lt; C-[ &gt;</td>
+<td align="left">切换到普通模式</td>
+</tr>
+<tr>
+<td align="left">&lt; C-o &gt;</td>
+<td align="left">切换到插入-普通模式</td>
+</tr>
+</tbody></table>
+<p>插入-普通模式是普通模式的一个特例,它能让我们执行一次普通模式命令.在此模式中,我们可以执行一个普通模式命令,执行完后,马上又返回到插入模式.</p>
+<h4 id="技巧15-不离开插入模式-粘贴寄存器中的文本"><a href="#技巧15-不离开插入模式-粘贴寄存器中的文本" class="headerlink" title="技巧15 不离开插入模式,粘贴寄存器中的文本"></a>技巧15 不离开插入模式,粘贴寄存器中的文本</h4><p>Vim的复制和粘贴操作一般都在普通模式中执行,不过有时我们也许想不离开插入模式,就能往文档里粘贴文本.<br>(个人感觉不太好用….)</p>
+<h4 id="随时随地做运算"><a href="#随时随地做运算" class="headerlink" title="随时随地做运算"></a>随时随地做运算</h4><p>表达式寄存器允许我们做一些运算,并把运算结果直接插入到文档中.</p>
+<p>我们可以用 <strong>=</strong> 指明使用表达式寄存器.在插入模式中输入 <strong><c-r>=</c-r></strong> 就可以访问这一寄存器.输入表达式后敲下 <strong><cr></cr></strong>  (Enter键),Vim就会把执行的结果插入到文档的当前位置.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/VIM%E6%8F%92%E5%85%A5%E6%A8%A1%E5%BC%8F%E4%B8%AD%E7%9A%84%E8%AE%A1%E7%AE%97.png" alt></p>
+<h4 id="技巧17-用字符编码插入非常用字符"><a href="#技巧17-用字符编码插入非常用字符" class="headerlink" title="技巧17 用字符编码插入非常用字符"></a>技巧17 用字符编码插入非常用字符</h4><p>只要知道某个字符的编码就可以让Vim插入该字符,我们可以用这种方式插入任意字符.只需在插入模式中输入 <strong><c-v>{code}</c-v></strong> 即可,其中 {code} 是要出入字符的编码.</p>
+<p>例如我们想插入 “A” , 我们只需要输入 <strong>{C-v}065</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">按键操作</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">&lt; C-v &gt;{123}</td>
+<td align="left">以十进制字符编码插入字符</td>
+</tr>
+<tr>
+<td align="left">&lt; C-v &gt;u{1234}</td>
+<td align="left">以十六进制字符编码插入字符</td>
+</tr>
+<tr>
+<td align="left">&lt; C-v &gt;{nondigit}</td>
+<td align="left">按原意插入非数字字符</td>
+</tr>
+<tr>
+<td align="left">&lt; c-k &gt;{char1}{char2}</td>
+<td align="left">插入以二合{char1}{char2}表示的字符</td>
+</tr>
+</tbody></table>
+<h4 id="技巧18-用二合字母插入非常用字符"><a href="#技巧18-用二合字母插入非常用字符" class="headerlink" title="技巧18 用二合字母插入非常用字符"></a>技巧18 用二合字母插入非常用字符</h4><p>(略)</p>
+<h4 id="技巧19-用替换模式替换已有文本"><a href="#技巧19-用替换模式替换已有文本" class="headerlink" title="技巧19 用替换模式替换已有文本"></a>技巧19 用替换模式替换已有文本</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Typing in Insert mode extends the line.But in Replace mode the line length doesn't change.</span><br></pre></td></tr></table></figure>
+
+<p>把这两个单独的句子合并成一句话,为此,需要把句号改为逗号,并将单词”But”中的”B”改为小写.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/Vim%E6%9B%BF%E6%8D%A2%E5%B7%B2%E6%9C%89%E6%96%87%E6%9C%AC.png" alt></p>
+<p>用 <strong>R</strong> 命令可以有普通模式进入替换模式</p>
+<h3 id="第四章-可视模式"><a href="#第四章-可视模式" class="headerlink" title="第四章 可视模式"></a>第四章 可视模式</h3><p>Vim具有3中不同的可视模式,分别用于操作字符文本、行文本或块文本。</p>
+<h4 id="技巧20-深入理解可视模式"><a href="#技巧20-深入理解可视模式" class="headerlink" title="技巧20 深入理解可视模式"></a>技巧20 深入理解可视模式</h4><p>可视模式允许我们选中一个文本区域并在其上操作.</p>
+<p>某些可视模式命令执行的基本功能与普通模式相同，但操作上有些细微的变化。例如，这两种模式中， <strong>c</strong> 命令的功能是一样的,都是删除指定的文本并切换到插入模式.</p>
+<p>例如把单词”March”修改为”April”.我们先把光标移动到”March”的某个位置,然后执行 <strong>viw</strong> 来高亮选择这个词,选择用 <strong>c</strong> 命令修改所选的内容,把这个单词删掉并进入插入模式,最后就可以输入完整的”April”了.</p>
+<h4 id="技巧21-选择高亮选区"><a href="#技巧21-选择高亮选区" class="headerlink" title="技巧21 选择高亮选区"></a>技巧21 选择高亮选区</h4><p><strong>v</strong> 键是通往可视模式的大门.</p>
+<p>在普通模式下,按 <strong>v</strong> 可激活面向字符的可视模式,按 <strong>V</strong> 可激活面向行的可视模式,而按 <strong>C-v</strong> 则可激活面向列块的可视模式.</p>
+<table>
+<thead>
+<tr>
+<th align="left">命令</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">v</td>
+<td align="left">激活面向字符的可视模式</td>
+</tr>
+<tr>
+<td align="left">V</td>
+<td align="left">激活面向行的可视模式</td>
+</tr>
+<tr>
+<td align="left">&lt; C-v &gt;</td>
+<td align="left">激活面向列块的可视模式</td>
+</tr>
+<tr>
+<td align="left">gv</td>
+<td align="left">重选上次的高亮选区</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">按键操作</th>
+<th align="left">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">&lt; Esc &gt; / &lt;C-[&gt;</td>
+<td align="left">回到普通模式</td>
+</tr>
+<tr>
+<td align="left">v / V / &lt; C-v &gt;</td>
+<td align="left">切换到普通模式(在对应的面向字符(行,块)中使用)</td>
+</tr>
+<tr>
+<td align="left">v</td>
+<td align="left">切换到面向字符的可视模式</td>
+</tr>
+<tr>
+<td align="left">V</td>
+<td align="left">切换到面向行的可视模式</td>
+</tr>
+<tr>
+<td align="left">&lt; C-v &gt;</td>
+<td align="left">切换到面向列块的可视模式</td>
+</tr>
+<tr>
+<td align="left">o</td>
+<td align="left">切换高亮选区的活动端</td>
+</tr>
+</tbody></table>
+<p>高亮选区的范围是由其两个端点界定.其中一端固定,而另一段可随着光标自由移动,我们可以用 <strong>o</strong> 键来切换其活动的端点.在定义选区时,如果定义到一半时,才发现选区开始的位置不对,我们不用退出可视模式再从头开始,只需要 <strong>o</strong> ,然后重新调整选区的边界即可.</p>
+<h4 id="技巧22-重复执行面向行的可视命令"><a href="#技巧22-重复执行面向行的可视命令" class="headerlink" title="技巧22 重复执行面向行的可视命令"></a>技巧22 重复执行面向行的可视命令</h4><p>在可视模式中执行完一条命令后,我们就会返回到普通模式,并且在可视模式里所选中的文本范围也不再高亮显示了.</p>
+<p>假设这段Python代码缩进有问题</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    a,b = <span class="number">0</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> (a &lt; n):</span><br><span class="line"><span class="keyword">print</span> a,</span><br><span class="line">a, b = b, a+b</span><br><span class="line">fib(<span class="number">42</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这段缩进错误的Python代码中,while关键字下面的两行应该多缩进两级,我们可以高亮选择这两行,然后用 <strong>&gt;</strong> 命令对它进行缩进,以修正其缩进的错误.</p>
+<p>要解决此问题,一个办法是使用 <strong>gv</strong> 命令重选相同的文本,然后再次调用缩进命令 <strong>.</strong></p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E4%B9%8B%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F1.png" alt></p>
+<h4 id="技巧23-只要可能-最好用操作符命令-而不是可视命令"><a href="#技巧23-只要可能-最好用操作符命令-而不是可视命令" class="headerlink" title="技巧23 只要可能,最好用操作符命令,而不是可视命令"></a>技巧23 只要可能,最好用操作符命令,而不是可视命令</h4><p>(略)</p>
+<h4 id="技巧24-用面向列快的可视模式编辑表格数据"><a href="#技巧24-用面向列快的可视模式编辑表格数据" class="headerlink" title="技巧24 用面向列快的可视模式编辑表格数据"></a>技巧24 用面向列快的可视模式编辑表格数据</h4><p>(略)</p>
+<h4 id="技巧25-修改列文本"><a href="#技巧25-修改列文本" class="headerlink" title="技巧25 修改列文本"></a>技巧25 修改列文本</h4><p>(略)</p>
+<h4 id="技巧26-在长短不一的高亮块后添加文本"><a href="#技巧26-在长短不一的高亮块后添加文本" class="headerlink" title="技巧26 在长短不一的高亮块后添加文本"></a>技巧26 在长短不一的高亮块后添加文本</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = <span class="number">1</span></span><br><span class="line"><span class="keyword">var</span> bar = <span class="string">'a'</span></span><br><span class="line"><span class="keyword">var</span> foobar = foo + bar</span><br></pre></td></tr></table></figure>
+
+<p>这段代码有连续的3行,每行的长度各不相同,而我们想在每行结尾加一个分号.</p>
+<p>我们可以进进入列块模式后,按 <strong>$</strong> 键把选区扩大到每行的行尾.</p>
+<p>确定好选区后,用 <strong>A</strong> 就可以在结尾添加内容了.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/vim%E4%B9%8B%E5%8F%AF%E8%A7%86%E6%A8%A1%E5%BC%8F2.png" alt></p>
+<h3 id="第五章-命令行模式"><a href="#第五章-命令行模式" class="headerlink" title="第五章 命令行模式"></a>第五章 命令行模式</h3><h4 id="技巧27-结实Vim的命令行模式"><a href="#技巧27-结实Vim的命令行模式" class="headerlink" title="技巧27 结实Vim的命令行模式"></a>技巧27 结实Vim的命令行模式</h4><p>出于历史原因,在命令模式中执行的命令又被称为做是Ex命令,Vim为几乎所有功能都提供了相应的Ex命令.(参见:h ex-cmd-index)</p>
+<p>我们可以利用Ex命令:</p>
+<p>读写文件( <strong>:edit</strong> 和 <strong>:write</strong> )</p>
+<p>创建新的标签页( <strong>:tabnew</strong> )</p>
+<p>分割窗口( <strong>:split</strong> )</p>
+<p>操作参数列表( <strong>:prev/:next</strong> )</p>
+<p>缓冲区列表( <strong>:bprev/:bnext</strong> )</p>
+<p>操作缓冲区文本的Ex命令<br>| 命令                                            | 用途                                                    |<br>| :———————————————- | :—————————————————— |<br>| :[range]delete[x]                               | 删除指定范围内的行[到寄存器x中]                         |<br>| :[range]yank[x]                                 | 复制指定范围的行[到寄存器x中]                           |<br>| :[line]put[x]                                   | 在指定行后粘贴寄存器x中的内容                           |<br>| :[range]copy{address}                           | 把指定范围内的行拷贝至{address}所指定的行之下           |<br>| :[range]move{address}                           | 把指定范围内的行移动到{address}所指定的行之下           |<br>| :[range]join                                    | 连接指定范围内的行                                      |<br>| :[range]normal{commands}                        | 对指定范围内的每一行执行普通模式命令{commands}          |<br>| :  [range]substitute/{pattern}/{string}/[flags] | 把指定范围内出现{pattern}的地方替换为{string}           |<br>| :[range]glpbal/{pattern}/[cmd]                  | 对指定范围内匹配{pattern}的所有行,在其上执行Ex命令{cmd} |</p>
+<h4 id="技巧28-在一行或多个连续行上执行命令"><a href="#技巧28-在一行或多个连续行上执行命令" class="headerlink" title="技巧28 在一行或多个连续行上执行命令"></a>技巧28 在一行或多个连续行上执行命令</h4><p>很多Ex命令可以用[range]指定要操作的范围.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> 1 #include &quot;apue.h&quot;</span><br><span class="line"> 2 #include &lt;fcntl.h&gt;</span><br><span class="line"> 3 </span><br><span class="line"> 4 int main(int argc, char ** argv)</span><br><span class="line"> 5 &#123;</span><br><span class="line"> 6     if(argc != 2)</span><br><span class="line"> 7         err_quit(&quot;usage: a.out &lt;pathname&gt;&quot;);</span><br><span class="line"> 8     if(access(argv[1],R_OK) &lt; 0)</span><br><span class="line"> 9         err_ret(&quot;access error for %s&quot; ,argv[1]);</span><br><span class="line">10     else</span><br><span class="line">11         printf(&quot;read access OK&quot;);</span><br><span class="line">12     if(open(argv[1],O_RDONLY) &lt; 0)</span><br><span class="line">13         err_ret(&quot;open error for %s&quot;, argv[1]);</span><br><span class="line">14     else</span><br><span class="line">15         printf(&quot;open for reading OK \n&quot;);</span><br><span class="line">16     exit(0);</span><br><span class="line">17 &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="用行号作为地址"><a href="#用行号作为地址" class="headerlink" title="用行号作为地址"></a>用行号作为地址</h5><p>如果输入一条值包含数字的Ex命令,那么Vim会把这个数字解析成一个地址,并把光标移动到该数字所指定的行上.</p>
+<p>=&gt;:1<br>=&gt;:print<br>《1 #include “apue.h”</p>
+<p>:p 是 :print 的简写,可以组合使用 =&gt;:1p</p>
+<p>用地址指定一个范围</p>
+<p>=&gt;:6,16p</p>
+<p>会打印第6行至第16行之间的每一行的内容.并且将光标停留在16行</p>
+<h4 id="技巧29-使用-‘-t’-和-‘-m’-命令复制和移动行"><a href="#技巧29-使用-‘-t’-和-‘-m’-命令复制和移动行" class="headerlink" title="技巧29 使用 ‘:t’ 和 ‘:m’ 命令复制和移动行"></a>技巧29 使用 ‘:t’ 和 ‘:m’ 命令复制和移动行</h4><p>略</p>
+<h4 id="技巧30-自动补全Ex命令"><a href="#技巧30-自动补全Ex命令" class="headerlink" title="技巧30 自动补全Ex命令"></a>技巧30 自动补全Ex命令</h4><p>如同在shell中一样,在命令行上也可以使用 <strong><tab></tab></strong> 键自动补全命令</p>
+<p>例如这样输入:<br>=&gt;:col<c-d><br>《colder colorscheme</c-d></p>
+<p><strong><c-d></c-d></strong> 命令会让VIM显示可用的补全列表</p>
+<h4 id="技巧31-把当前单词插入到命令行"><a href="#技巧31-把当前单词插入到命令行" class="headerlink" title="技巧31 把当前单词插入到命令行"></a>技巧31 把当前单词插入到命令行</h4><p>(略)</p>
+<h4 id="技巧35-运行shell命令"><a href="#技巧35-运行shell命令" class="headerlink" title="技巧35 运行shell命令"></a>技巧35 运行shell命令</h4><p>(略)</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/08/C++之迭代器/" rel="next" title="C++之迭代器">
+                <i class="fa fa-chevron-left"></i> C++之迭代器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/23/GCC与静态库、动态库/" rel="prev" title="GCC与静态库、动态库">
+                GCC与静态库、动态库 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Vim实用技巧"><span class="nav-text">Vim实用技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Vim的配置文件"><span class="nav-text">Vim的配置文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Vim分屏"><span class="nav-text">Vim分屏</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#第一章-Vim解决问题的方式"><span class="nav-text">第一章 Vim解决问题的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧1-命令"><span class="nav-text">技巧1 . 命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧2-减少无关操作"><span class="nav-text">技巧2 减少无关操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧3-以退为进"><span class="nav-text">技巧3 以退为进</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧4-执行、重复、回退"><span class="nav-text">技巧4 执行、重复、回退</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧5-查找并手动替换"><span class="nav-text">技巧5 查找并手动替换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧6-结识-的范式-略"><span class="nav-text">技巧6 结识 . 的范式 (略)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一部分-模式"><span class="nav-text">第一部分 模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第二章-普通模式"><span class="nav-text">第二章 普通模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧7-停顿时请移开画笔-略"><span class="nav-text">技巧7 停顿时请移开画笔 (略)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧8-把撤销单元切成块"><span class="nav-text">技巧8 把撤销单元切成块</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧9-构造可重复的修改"><span class="nav-text">技巧9 构造可重复的修改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧10-用次数做简单的算术运算"><span class="nav-text">技巧10 用次数做简单的算术运算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧11-能够重复-就别用次数"><span class="nav-text">技巧11 能够重复,就别用次数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧12-双剑合璧-天下无敌"><span class="nav-text">技巧12 双剑合璧,天下无敌</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#操作符-动作命令-操作"><span class="nav-text">操作符 + 动作命令 = 操作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三章-插入模式"><span class="nav-text">第三章 插入模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧13-在插入模式中可即时更正错误"><span class="nav-text">技巧13 在插入模式中可即时更正错误</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧14-返回普通模式"><span class="nav-text">技巧14 返回普通模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧15-不离开插入模式-粘贴寄存器中的文本"><span class="nav-text">技巧15 不离开插入模式,粘贴寄存器中的文本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#随时随地做运算"><span class="nav-text">随时随地做运算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧17-用字符编码插入非常用字符"><span class="nav-text">技巧17 用字符编码插入非常用字符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧18-用二合字母插入非常用字符"><span class="nav-text">技巧18 用二合字母插入非常用字符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧19-用替换模式替换已有文本"><span class="nav-text">技巧19 用替换模式替换已有文本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四章-可视模式"><span class="nav-text">第四章 可视模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧20-深入理解可视模式"><span class="nav-text">技巧20 深入理解可视模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧21-选择高亮选区"><span class="nav-text">技巧21 选择高亮选区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧22-重复执行面向行的可视命令"><span class="nav-text">技巧22 重复执行面向行的可视命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧23-只要可能-最好用操作符命令-而不是可视命令"><span class="nav-text">技巧23 只要可能,最好用操作符命令,而不是可视命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧24-用面向列快的可视模式编辑表格数据"><span class="nav-text">技巧24 用面向列快的可视模式编辑表格数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧25-修改列文本"><span class="nav-text">技巧25 修改列文本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧26-在长短不一的高亮块后添加文本"><span class="nav-text">技巧26 在长短不一的高亮块后添加文本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第五章-命令行模式"><span class="nav-text">第五章 命令行模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧27-结实Vim的命令行模式"><span class="nav-text">技巧27 结实Vim的命令行模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧28-在一行或多个连续行上执行命令"><span class="nav-text">技巧28 在一行或多个连续行上执行命令</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#用行号作为地址"><span class="nav-text">用行号作为地址</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧29-使用-‘-t’-和-‘-m’-命令复制和移动行"><span class="nav-text">技巧29 使用 ‘:t’ 和 ‘:m’ 命令复制和移动行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧30-自动补全Ex命令"><span class="nav-text">技巧30 自动补全Ex命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧31-把当前单词插入到命令行"><span class="nav-text">技巧31 把当前单词插入到命令行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#技巧35-运行shell命令"><span class="nav-text">技巧35 运行shell命令</span></a></li></ol></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

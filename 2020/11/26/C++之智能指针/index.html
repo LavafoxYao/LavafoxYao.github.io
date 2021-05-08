@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="C++,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="智能指针属于C++中的重中之重了，趁着最近有点时间好好总结一下。">
+<meta name="keywords" content="C++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++之智能指针">
+<meta property="og:url" content="http://yoursite.com/2020/11/26/C++之智能指针/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="智能指针属于C++中的重中之重了，趁着最近有点时间好好总结一下。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-26_16-02-23.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/smart_point.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/smart_point2.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.108Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++之智能指针">
+<meta name="twitter:description" content="智能指针属于C++中的重中之重了，趁着最近有点时间好好总结一下。">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-26_16-02-23.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/11/26/C++之智能指针/">
+
+
+
+
+
+  <title>C++之智能指针 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/26/C++之智能指针/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C++之智能指针</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-11-26T18:48:05+08:00">
+                2020-11-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index">
+                    <span itemprop="name">C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>智能指针属于C++中的重中之重了，趁着最近有点时间好好总结一下。</p>
+<a id="more"></a>
+
+<h5 id="为什么要使用智能指针"><a href="#为什么要使用智能指针" class="headerlink" title="为什么要使用智能指针?"></a>为什么要使用智能指针?</h5><p>智能指针最大的作用就是:<strong>管理在堆上申请的内存，避免内存泄露。</strong></p>
+<p>因为在我们在写代码的时候，如果在堆上申请了内存，离开该作用于时却忘记释放这块内存，那么这块申请的内存只要进程一直在运行，我们就永远无法使用它，从而造成了内存泄露。</p>
+<p>智能指针运用了<code>RAII</code>的机制，让我们管理内存变得简单。</p>
+<h5 id="那么什么又是RAII机制呢？"><a href="#那么什么又是RAII机制呢？" class="headerlink" title="那么什么又是RAII机制呢？"></a>那么什么又是<code>RAII</code>机制呢？</h5><p>简单的说就是：资源的有效期与持有资源的对象的生命期严格绑定，即由<strong>对象的构造函数完成资源的分配</strong>，用时由<strong>对象的析构函数完成资源的释放</strong>。在这种要求下，只要对象能够正确的析构，就不会出现资源泄露的问题。</p>
+<h3 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h3><p>auto_ptr出现在C++98的方案中，现已被C++11抛弃。</p>
+<p>被抛弃的原因： auto_ptr负责维护一个对象指针，在自身析构的时候一定会通过delete方式释放非空指针。因此<strong>auto_ptr不能管理对象数组指针</strong>。为了避免重复释放，在auto_ptr实例之间赋值时，会转移托管指针的控制权，即在赋值完成后，托管指针变为nullptr。 </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">auto_ptr</span>&lt;<span class="built_in">string</span>&gt; p1(<span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">"hello"</span>));</span><br><span class="line"><span class="built_in">auto_ptr</span>&lt;<span class="built_in">string</span>&gt; p2;</span><br><span class="line">p2 = p1;		<span class="comment">// auto_ptr 可以正常编译.</span></span><br></pre></td></tr></table></figure>
+
+<p>上述代码可以正常的编译，但是会出现潜在的问题因为<code>p1</code>已经把所有权转交给<code>p2</code>，当我们再次访问<code>p1</code>时候会报错。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/Snipaste_2020-11-26_16-02-23.png" alt></p>
+<p>所以auto_ptr的缺点是：<strong>潜在着内存崩溃的问题</strong>。</p>
+<h3 id="unique-ptr"><a href="#unique-ptr" class="headerlink" title="unique_ptr"></a>unique_ptr</h3><p><code>unique_ptr</code>简单的说是<code>auto_ptr</code>的升级版。它实现了<strong>严格拥有</strong>的概念，<strong>保证了同一时间内只有一个智能指针可以指向该对象</strong>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unique_ptr</span>&lt;<span class="built_in">string</span>&gt; p1(<span class="keyword">new</span> <span class="built_in">string</span>(<span class="string">"hello"</span>));</span><br><span class="line"><span class="built_in">unique_ptr</span>&lt;<span class="built_in">string</span>&gt; p2;</span><br><span class="line">p2 = p1;					<span class="comment">// 语法错误.(vs 2019) [因为p1还存在于程序中,防止被引用]</span></span><br></pre></td></tr></table></figure>
+
+<p>编译器认为 <code>p2 = p1</code>是非法的，从而避免了<code>p1</code>被转移后指向<code>nullptr</code>的问题。因此<code>unique_ptr</code>较之<code>auto_ptr</code>更安全。</p>
+<p>另外<code>unique_ptr</code>还有更聪明的地方: 当程序试图将<code>unique_ptr</code>赋值给另一个时：</p>
+<pre><code>1. 如果源`unique_ptr`将要存在一段时间，那么编译器将禁止这么做。（上面例子说明了这个问题）
+
+   2. 如果源`unique_ptr`是**临时的右值**，那么编译器将允许这么做。(见下)</code></pre><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unique_ptr</span>&lt;<span class="built_in">string</span>&gt; p3;</span><br><span class="line">p3 = <span class="built_in">unique_ptr</span>&lt;<span class="built_in">string</span>&gt; (<span class="keyword">new</span> <span class="built_in">string</span> (<span class="string">"world!"</span>));	<span class="comment">// 可以通过编译</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="unique-ptr的实现"><a href="#unique-ptr的实现" class="headerlink" title="unique_ptr的实现"></a>unique_ptr的实现</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UniquePtr</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T* _ptr;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    UniquePtr(T* p = <span class="literal">nullptr</span>) : _ptr(p) &#123;&#125;;</span><br><span class="line">    <span class="comment">// 禁止拷贝赋值</span></span><br><span class="line">    UniquePtr(<span class="keyword">const</span> UniquePtr&amp; p) = <span class="keyword">delete</span>;</span><br><span class="line">    UniquePtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> UniquePtr&amp; p) = <span class="keyword">delete</span>;</span><br><span class="line">    <span class="comment">// 支持移动拷贝</span></span><br><span class="line">    UniquePtr(UniquePtr&amp;&amp; p): _ptr(p)&#123;</span><br><span class="line">        p = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    UniquePtr&amp; <span class="keyword">operator</span>=(UniquePtr&amp;&amp; p) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr != p._ptr) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr)</span><br><span class="line">                <span class="keyword">delete</span> <span class="keyword">this</span>-&gt;_ptr;</span><br><span class="line">            <span class="keyword">this</span>-&gt;_ptr = p._ptr;</span><br><span class="line">            p._ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() &#123; </span><br><span class="line">        assert(<span class="keyword">this</span>-&gt;_ptr == <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">return</span> *(<span class="keyword">this</span>-&gt;_ptr); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T* <span class="keyword">operator</span>-&gt;() &#123;</span><br><span class="line">        assert(<span class="keyword">this</span>-&gt;_ptr == <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>-&gt;_ptr; </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    *   u.reset() 释放u指向的对象</span></span><br><span class="line"><span class="comment">    *   u.reset(q)如果提供了内置指针q,令u指向这个对象;否则将u置为空</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">(T* q = <span class="literal">nullptr</span>)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (q != <span class="keyword">this</span>-&gt;_ptr) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr)</span><br><span class="line">                <span class="keyword">delete</span> <span class="keyword">this</span>-&gt;_ptr;</span><br><span class="line">            <span class="keyword">this</span>-&gt;_ptr = q;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	<span class="comment">// u.release()  放弃u对指针的控制权,返回指针,并将u置为空</span></span><br><span class="line">    <span class="function">T* <span class="title">release</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        T* res = <span class="keyword">this</span>-&gt;_ptr;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_ptr = <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">T* <span class="title">get</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">this</span>-&gt;_ptr; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(UniquePtr&amp; p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr != p._ptr)</span><br><span class="line">            swap(<span class="keyword">this</span>-&gt;_ptr, p._ptr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h3><p>shared_ptr实现了共享式拥有的概念。<strong>多个智能指针可以指向相同对象</strong>，该对象可以和其相关资源会在“最后一个引用被销毁”的时候释放。（是不是有点像<code>inode</code>的引用计数，当<code>inode</code>引用计数为0的时候才会把<code>inode</code>指向的<code>data</code>删除）。</p>
+<p><strong>「share_ptr 内部的应用计数是线程安全的，但对象的读取需要加锁」</strong></p>
+<p><code>share_ptr</code>不仅可以通过<code>new</code>来构造，还可以通过传入<code>auto_ptr</code>，<code>unique_ptr</code>，<code>weak_ptr</code>来构造。</p>
+<p><code>share_ptr</code>解决了<code>auto_ptr</code>在对象所有权上的局限性(独占式)，在使用引用计数的机制上提供了可以共享所有权的智能指针。</p>
+<h5 id="shared-ptr的实现"><a href="#shared-ptr的实现" class="headerlink" title="shared_ptr的实现"></a>shared_ptr的实现</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SharedPtr</span> &#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">size_t</span> _cnt;</span><br><span class="line">    T* _ptr;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    SharedPtr(T* ptr = <span class="literal">nullptr</span>) : _ptr(ptr) &#123;</span><br><span class="line">        <span class="keyword">if</span> (_ptr == <span class="literal">nullptr</span>)    _cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            _cnt = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SharedPtr(<span class="keyword">const</span> SharedPtr&amp; ptr) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr != ptr._ptr) &#123;</span><br><span class="line">            _ptr = ptr._ptr;</span><br><span class="line">            _cnt = ptr._cnt;</span><br><span class="line">            _cnt++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SharedPtr&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> SharedPtr&amp; ptr) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr == ptr._ptr)</span><br><span class="line">            <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_ptr) &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;_cnt--;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_cnt == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">delete</span> <span class="keyword">this</span>-&gt;_ptr;</span><br><span class="line">                <span class="keyword">this</span>-&gt;_cnt = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_ptr = ptr._ptr;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_cnt = ptr._cnt;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_cnt++;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T&amp; <span class="keyword">operator</span>*() &#123;</span><br><span class="line">        assert(<span class="keyword">this</span>-&gt;_ptr == <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    T&amp; <span class="keyword">operator</span>-&gt;() &#123;</span><br><span class="line">        assert(<span class="keyword">this</span>-&gt;_ptr == <span class="literal">nullptr</span>);</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~SharedPtr() &#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_cnt--;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_cnt == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">delete</span> <span class="keyword">this</span>-&gt;_ptr;</span><br><span class="line">            _cnt = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">size_t</span> use_count() &#123;</span><br><span class="line">        <span class="keyword">return</span> _cnt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h5 id="shared-ptr的缺陷-从上面的描述看来"><a href="#shared-ptr的缺陷-从上面的描述看来" class="headerlink" title="shared_ptr的缺陷 从上面的描述看来"></a>shared_ptr的缺陷 从上面的描述看来</h5><p><code>shared_ptr</code>已经非常的完美了，但是真的是这样吗？</p>
+<p>我们拿个双向链表作为例子来说明<code>shared_ptr</code>造成循环引用</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> _data;</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; _next;</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; _prev;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; ptr_1(<span class="keyword">new</span> Node);</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; ptr_2(<span class="keyword">new</span> Node);</span><br><span class="line">  </span><br><span class="line">    ptr_1-&gt;_next = ptr_2;</span><br><span class="line">   	ptr_2-&gt;_prev = ptr_1;</span><br><span class="line">   </span><br><span class="line">    <span class="built_in">cout</span>  &lt;&lt; <span class="string">"ptr_1 ==&gt; "</span> &lt;&lt; ptr_1.use_count() &lt;&lt; <span class="string">"  ptr_2 ==&gt; "</span> &lt;&lt; ptr_2.use_count() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由上我们可以看到<code>ptr_1-&gt;_next = ptr_2;</code> <code>ptr_l1</code>的引用计数增加1，变为2。<code>ptr_l2</code>同理。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/smart_point.png" alt></p>
+<p>当我们要销毁<code>ptr_l1</code>时，我们必须使得它的引用计数在定义其的定义域内为1，因为离开作用域时候才会正常减1，使得其被销毁。</p>
+<p>所以我们只能把<code>ptr_l1-&gt;next</code>销毁，但是<code>ptr_l1-&gt;next</code>是<code>ptr_l2</code>，它要被销毁必须使得<code>ptr_l2-&gt;prev</code>被销毁掉，所以就形成了一个相互僵持的状态（是不是很类似于死锁），导致两者都不能成功被销毁，从而致使内存泄露。</p>
+<h3 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h3><p><code>weak_ptr</code>的作用就是避免<code>shared_ptr</code>陷入循环引用这种尴尬的局面。</p>
+<p><code>weak_ptr</code>是一种不控制对象生命周期的智能指针，它指向一个<code>shared_ptr</code>管理的对象。</p>
+<p><code>weak_ptr</code>只是提供了管理对象的一个访问手段，从另一方面来说它的指向并不会是的<code>shared_ptr</code>对象的引用计数加一。它是对对象的一种弱引用，不会增加对象的引用计数，和<code>shared_ptr</code>可以相互转换，<code>shared_ptr</code>也可以直接赋值给它，它也可以通过调用<code>lock()</code>来获得<code>shared_ptr</code>。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/11/smart_point2.png" alt></p>
+<p>上面那种尴尬的局面可以把代码改成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span>&#123;</span></span><br><span class="line">    <span class="keyword">int</span> _data;</span><br><span class="line">    weak_ptr&lt;Node&gt; _next;</span><br><span class="line">    weak_ptr&lt;Node&gt; _prev;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; ptr_1(<span class="keyword">new</span> Node);</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Node&gt; ptr_2(<span class="keyword">new</span> Node);</span><br><span class="line">  </span><br><span class="line">    ptr_1-&gt;_next = ptr_2;</span><br><span class="line">    ptr_2-&gt;_prev = ptr_1;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">cout</span>  &lt;&lt; <span class="string">"ptr_1 ==&gt; "</span> &lt;&lt; ptr_1.use_count() &lt;&lt; <span class="string">"  ptr_2 ==&gt; "</span> &lt;&lt; ptr_2.use_count() &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/24/浅谈条件变量与互斥量的关系/" rel="next" title="浅谈条件变量与互斥量的关系">
+                <i class="fa fa-chevron-left"></i> 浅谈条件变量与互斥量的关系
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/27/C++之内存布局/" rel="prev" title="C++之内存布局">
+                C++之内存布局 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#为什么要使用智能指针"><span class="nav-text">为什么要使用智能指针?</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#那么什么又是RAII机制呢？"><span class="nav-text">那么什么又是RAII机制呢？</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#auto-ptr"><span class="nav-text">auto_ptr</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unique-ptr"><span class="nav-text">unique_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#unique-ptr的实现"><span class="nav-text">unique_ptr的实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shared-ptr"><span class="nav-text">shared_ptr</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#shared-ptr的实现"><span class="nav-text">shared_ptr的实现</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#shared-ptr的缺陷-从上面的描述看来"><span class="nav-text">shared_ptr的缺陷 从上面的描述看来</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#weak-ptr"><span class="nav-text">weak_ptr</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

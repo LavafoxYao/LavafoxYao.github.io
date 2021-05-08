@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="LeetCode,DP,数学,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="丑数也是一道很经典的题目。 在LeetCode上一共有四道，我们今天只讲前三题，后面一题找时间再补上来吧。">
+<meta name="keywords" content="LeetCode,DP,数学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 丑数">
+<meta property="og:url" content="http://yoursite.com/2020/12/30/LeetCode-丑数/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="丑数也是一道很经典的题目。 在LeetCode上一共有四道，我们今天只讲前三题，后面一题找时间再补上来吧。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.127Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LeetCode 丑数">
+<meta name="twitter:description" content="丑数也是一道很经典的题目。 在LeetCode上一共有四道，我们今天只讲前三题，后面一题找时间再补上来吧。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/12/30/LeetCode-丑数/">
+
+
+
+
+
+  <title>LeetCode 丑数 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/30/LeetCode-丑数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LeetCode 丑数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-30T18:52:06+08:00">
+                2020-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/题解/" itemprop="url" rel="index">
+                    <span itemprop="name">题解</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>丑数也是一道很经典的题目。</p>
+<p>在LeetCode上一共有四道，我们今天只讲前三题，后面一题找时间再补上来吧。</p>
+<a id="more"></a>
+
+<h3 id="263-丑数"><a href="#263-丑数" class="headerlink" title="263. 丑数"></a><a href="https://leetcode-cn.com/problems/ugly-number/" target="_blank" rel="noopener">263. 丑数</a></h3><blockquote>
+<p>编写一个程序判断给定的数是否为丑数。</p>
+<p>丑数就是只包含质因数 <code>2, 3, 5</code> 的<strong>正整数</strong>。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; 输入: 6</span><br><span class="line">&gt; 输出: true</span><br><span class="line">&gt; 解释: 6 = 2 × 3</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; 输入: 8</span><br><span class="line">&gt; 输出: true</span><br><span class="line">&gt; 解释: 8 = 2 × 2 × 2</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>示例 3:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; 输入: 14</span><br><span class="line">&gt; 输出: false </span><br><span class="line">&gt; 解释: 14 不是丑数，因为它包含了另外一个质因数 7。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>说明：</strong></p>
+<ol>
+<li><code>1</code> 是丑数。</li>
+<li>输入不会超过 32 位有符号整数的范围: [−2^31, 2^31 − 1]。</li>
+</ol>
+</blockquote>
+<p>思路:其实这一题挺简单的，就是判断某个数是否只是由【2, 3, 5】作为因子组成，我们给出两种代码。</p>
+<h5 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isUgly</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">0</span>)   <span class="keyword">return</span> <span class="literal">false</span>;	<span class="comment">// 0并不是丑数</span></span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">1</span>)   <span class="keyword">return</span> <span class="literal">true</span>;	<span class="comment">// 1虽然不含[2,3,5] 但是也属于丑数</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="number">1</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span> (num % <span class="number">2</span> == <span class="number">0</span>)</span><br><span class="line">                num /= <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (num % <span class="number">3</span> == <span class="number">0</span>)</span><br><span class="line">                num /= <span class="number">3</span>;</span><br><span class="line">            <span class="keyword">if</span> (num % <span class="number">5</span> == <span class="number">0</span>)</span><br><span class="line">                num /= <span class="number">5</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> num == <span class="number">1</span> ? <span class="literal">true</span> : <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h5 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isUgly</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">0</span>)   <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">1</span>)   <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> vaild(num);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">vaild</span><span class="params">(<span class="keyword">int</span> num)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">2</span>)   <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">3</span>)   <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (num == <span class="number">5</span>)   <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (num % <span class="number">2</span> == <span class="number">0</span>)  <span class="keyword">return</span> vaild(num / <span class="number">2</span>);</span><br><span class="line">        <span class="keyword">if</span> (num % <span class="number">3</span> == <span class="number">0</span>)  <span class="keyword">return</span> vaild(num / <span class="number">3</span>);</span><br><span class="line">        <span class="keyword">if</span> (num % <span class="number">5</span> == <span class="number">0</span>)  <span class="keyword">return</span> vaild(num / <span class="number">5</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="264-丑数-II"><a href="#264-丑数-II" class="headerlink" title="264. 丑数 II"></a><a href="https://leetcode-cn.com/problems/ugly-number-ii/" target="_blank" rel="noopener">264. 丑数 II</a></h3><blockquote>
+<p>编写一个程序，找出第 <code>n</code> 个丑数。</p>
+<p>丑数就是质因数只包含 <code>2, 3, 5</code> 的<strong>正整数</strong>。</p>
+<p><strong>示例:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; 输入: n = 10</span><br><span class="line">&gt; 输出: 12</span><br><span class="line">&gt; 解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>说明:</strong> </p>
+<ol>
+<li><code>1</code> 是丑数。</li>
+<li><code>n</code> <strong>不超过</strong>1690。</li>
+</ol>
+</blockquote>
+<p>思路:我贴上LeetCode上面大佬对这种思路的解释</p>
+<p><a href="https://leetcode-cn.com/problems/chou-shu-lcof/comments/" target="_blank" rel="noopener">sunrise</a></p>
+<p>我们知道，丑数的排列肯定是<code>1,2,3,4,5,6,8,10....</code> 然后有一个特点是，任意一个丑数都是由小于它的某一个丑数<code>*2</code>，<code>*3</code>或者<code>*5</code>得到的，</p>
+<p><strong>那么如何得到所有丑数呢？</strong> 现在假设有3个数组，分别是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A：&#123;<span class="number">1</span>*<span class="number">2</span>，<span class="number">2</span>*<span class="number">2</span>，<span class="number">3</span>*<span class="number">2</span>，<span class="number">4</span>*<span class="number">2</span>，<span class="number">5</span>*<span class="number">2</span>，<span class="number">6</span>*<span class="number">2</span>，<span class="number">8</span>*<span class="number">2</span>，<span class="number">10</span>*<span class="number">2.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">B：&#123;<span class="number">1</span>*<span class="number">3</span>，<span class="number">2</span>*<span class="number">3</span>，<span class="number">3</span>*<span class="number">3</span>，<span class="number">4</span>*<span class="number">3</span>，<span class="number">5</span>*<span class="number">3</span>，<span class="number">6</span>*<span class="number">3</span>，<span class="number">8</span>*<span class="number">3</span>，<span class="number">10</span>*<span class="number">3.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">C：&#123;<span class="number">1</span>*<span class="number">5</span>，<span class="number">2</span>*<span class="number">5</span>，<span class="number">3</span>*<span class="number">5</span>，<span class="number">4</span>*<span class="number">5</span>，<span class="number">5</span>*<span class="number">5</span>，<span class="number">6</span>*<span class="number">5</span>，<span class="number">8</span>*<span class="number">5</span>，<span class="number">10</span>*<span class="number">5.</span>.....&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么所有丑数的排列，必定就是上面<code>A  B  C</code>3个数组的合并结果然后去重得到的，那么这不就转换成了三个有序数组的无重复元素合并的问题了吗？</p>
+<p>而这三个数组就刚好是{1,2,3,4,5,6,8,10….}乘以2,3,5得到的。</p>
+<p>合并有序数组的一个比较好的方法，<strong>就是每个数组都对应一个指针，然后比较这些指针所指的数中哪个最小，就将这个数放到结果数组中，然后该指针向后挪一位。</strong></p>
+<p>回到本题，要求丑数ugly数组中的第n项，而<strong>目前只知道ugly[0]=1</strong>，所以此时三个有序链表分别就只有一个元素：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A ： &#123;<span class="number">1</span>*<span class="number">2.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">B ： &#123;<span class="number">1</span>*<span class="number">3.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">C ： &#123;<span class="number">1</span>*<span class="number">5.</span>.....&#125;</span><br></pre></td></tr></table></figure>
+
+<p>假设三个数组的指针分别是<code>i,j,k</code>，此时均是指向第一个元素，然后比较A[i]，B[j]和C[k]，得到的最小的数A[i]，就是ugly[1]，此时ugly就变成{1, 2}了，对应的ABC数组就分别变成了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A ： &#123;<span class="number">1</span>*<span class="number">2</span>，<span class="number">2</span>*<span class="number">2.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">B ： &#123;<span class="number">1</span>*<span class="number">3</span>, <span class="number">2</span>*<span class="number">3.</span>.....&#125;</span><br><span class="line"></span><br><span class="line">C ： &#123;<span class="number">1</span>*<span class="number">5</span>,<span class="number">2</span>*<span class="number">5.</span>.....&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时根据合并有序数组的原理，A数组指针i就指向了下一个元素，即’2*2’，而j和k依然分别指向B[0]和C[0]，然后进行下一轮合并，就是A[1]和B[0]和C[0]比较，最小值作为ugly[2]…..如此循环n次，就可以得到ugly[n]了。</p>
+<p>此外，注意到ABC三个数组实际上就是<code>ugly[]*2</code>，<code>ugly[]*3</code>和<code>ugly[]*5</code>的结果，所以每次只需要比较<code>A[i]=ugly[i]*2</code>，<code>B[j]=ugly[j]*3</code>和<code>C[k]=ugly[k]*5</code>的大小即可。然后谁最小，就把对应的指针往后移动一个，<strong>为了去重，如果多个元素都是最小，那么这多个指针都要往后移动一个(一定要注意这一句话)。</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">nthUglyNumber</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 根据上面的思路讲解,你说这属于DP吗? 我也没有结论...</span></span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; dp(n, INT_MAX);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> cnt_2 = <span class="number">0</span>, cnt_3 = <span class="number">0</span>, cnt_5 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i)&#123;</span><br><span class="line">            dp[i] = min(dp[cnt_2] * <span class="number">2</span>, min(dp[cnt_3] * <span class="number">3</span>, dp[cnt_5] * <span class="number">5</span>));</span><br><span class="line">            <span class="comment">// 这里有个细节就是一定要和所有的情况进行比较, </span></span><br><span class="line">            <span class="comment">// 在不同方式得到相同丑数的时候只能取一种, </span></span><br><span class="line">            <span class="comment">// 达到去重的效果</span></span><br><span class="line">            <span class="keyword">if</span> (dp[i] == dp[cnt_2] * <span class="number">2</span>)  cnt_2++;</span><br><span class="line">            <span class="keyword">if</span> (dp[i] == dp[cnt_3] * <span class="number">3</span>)  cnt_3++;</span><br><span class="line">            <span class="keyword">if</span> (dp[i] == dp[cnt_5] * <span class="number">5</span>)  cnt_5++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="313-超级丑数"><a href="#313-超级丑数" class="headerlink" title="313. 超级丑数"></a><a href="https://leetcode-cn.com/problems/super-ugly-number/" target="_blank" rel="noopener">313. 超级丑数</a></h3><blockquote>
+<p>编写一段程序来查找第 <code>*n*</code> 个超级丑数。<br>超级丑数是指其所有质因数都是长度为 <code>k</code> 的质数列表 <code>primes</code> 中的正整数。</p>
+<p> <strong>示例:</strong> </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; 输入: n = 12, primes = [2,7,13,19]</span><br><span class="line">&gt; 输出: 32 </span><br><span class="line">&gt; 解释: 给定长度为 4 的质数列表 primes = [2,7,13,19]，</span><br><span class="line">&gt; 前 12 个超级丑数序列为：[1,2,4,7,8,13,14,16,19,26,28,32] 。</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p><strong>说明:</strong></p>
+<p>1 是任何给定 primes 的超级丑数。<br> 给定 primes 中的数字以升序排列。<br>0 &lt; k ≤ 100, 0 &lt; n ≤ 10^6, 0 &lt; primes[i] &lt; 1000 。<br>第 n 个超级丑数确保在 32 位有符整数范围内。</p>
+</blockquote>
+<p>思路: 超级丑数这一题是丑数II的一个泛化版本，在思路上基本是一模一样的。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">nthSuperUglyNumber</span><span class="params">(<span class="keyword">int</span> n, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; primes)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; dp(n, INT_MAX);</span><br><span class="line">        <span class="comment">// cnt与丑数II中2 3 5 计数变量有着相同的作用</span></span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; cnt(primes.size(), <span class="number">0</span>);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i)&#123;</span><br><span class="line">            <span class="comment">// 挑选出当前顺序中最小的</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; primes.size(); ++j)</span><br><span class="line">                dp[i] = min(dp[i], dp[cnt[j]] * primes[j]);</span><br><span class="line">            <span class="comment">// 把cnt计数 + 1;</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; primes.size(); ++j)</span><br><span class="line">                <span class="keyword">if</span> (dp[i] == dp[cnt[j]] * primes[j])    cnt[j]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[n - <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+          
+            <a href="/tags/DP/" rel="tag"># DP</a>
+          
+            <a href="/tags/数学/" rel="tag"># 数学</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/12/24/LeetCode-135-分发糖果/" rel="next" title="LeetCode 135.分发糖果">
+                <i class="fa fa-chevron-left"></i> LeetCode 135.分发糖果
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/12/31/2020年终总结/" rel="prev" title="2020年终总结">
+                2020年终总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#263-丑数"><span class="nav-text">263. 丑数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#迭代"><span class="nav-text">迭代</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#递归"><span class="nav-text">递归</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#264-丑数-II"><span class="nav-text">264. 丑数 II</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#313-超级丑数"><span class="nav-text">313. 超级丑数</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

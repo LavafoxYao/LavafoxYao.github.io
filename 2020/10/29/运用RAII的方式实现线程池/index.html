@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="网络编程,多线程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="最近这段时间在处理完实验室论文的事之后，都一直在学习如何去实现一个简易的webserver。今天来记录下学习到的重点知识。">
+<meta name="keywords" content="网络编程,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="运用RAII的方式实现线程池">
+<meta property="og:url" content="http://yoursite.com/2020/10/29/运用RAII的方式实现线程池/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="最近这段时间在处理完实验室论文的事之后，都一直在学习如何去实现一个简易的webserver。今天来记录下学习到的重点知识。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-31_15-17-47.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.142Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="运用RAII的方式实现线程池">
+<meta name="twitter:description" content="最近这段时间在处理完实验室论文的事之后，都一直在学习如何去实现一个简易的webserver。今天来记录下学习到的重点知识。">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-31_15-17-47.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/29/运用RAII的方式实现线程池/">
+
+
+
+
+
+  <title>运用RAII的方式实现线程池 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/29/运用RAII的方式实现线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">运用RAII的方式实现线程池</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-29T09:59:51+08:00">
+                2020-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近这段时间在处理完实验室论文的事之后，都一直在学习如何去实现一个简易的<code>webserver</code>。今天来记录下学习到的重点知识。</p>
+<a id="more"></a>
+
+<h4 id="RAII是什么？"><a href="#RAII是什么？" class="headerlink" title="RAII是什么？"></a>RAII是什么？</h4><p><a href="https://zh.wikipedia.org/wiki/RAII" target="_blank" rel="noopener">引用：RAII 维基百科解释</a></p>
+<p><strong>RAII</strong>，全称<strong>资源获取即初始化</strong>（英语：Resource Acquisition Is Initialization），它是在一些面向对象语言中的一种惯用法。<strong>RAII</strong>源于C++，在Java，C#，D，Ada，Vala和Rust中也有应用。</p>
+<p><strong>RAII要求，资源的有效期与持有资源的对象的生命期严格绑定，即由对象的构造函数完成资源的分配（获取），同时由析构函数完成资源的释放。在这种要求下，只要对象能正确地析构，就不会出现资源泄露问题。</strong></p>
+<p>由于系统的各种资源都是有限的，我们必须准守一个原则：</p>
+<ol>
+<li>申请资源</li>
+<li>使用</li>
+<li>释放</li>
+</ol>
+<p>但是由于代码的复杂性，我们很容易忽略第三步，又由于<code>C++</code>并没有像<code>JAVA</code>的<code>GC</code>机制，又要确保资源能够及时的回收。<code>RAII</code>的出现就极大的简化了资源管理，并能够保证程序的正确性和代码的简洁性。</p>
+<h3 id="线程池是什么？"><a href="#线程池是什么？" class="headerlink" title="线程池是什么？"></a>线程池是什么？</h3><p><a href="https://zh.wikipedia.org/wiki/%E7%BA%BF%E7%A8%8B%E6%B1%A0" target="_blank" rel="noopener">引用：线程池 维基百科解释</a></p>
+<p><strong>线程池（英语：thread pool）</strong>：一种线程使用模式。线程过多会带来<strong>调度开销</strong>，进而影响缓存局部性和整体性能。而线程池维护着多个线程，等待着监督管理者分配可并发执行的任务。这避免了在处理短时间任务时创建与销毁线程的代价。<strong>线程池不仅能够保证内核的充分利用，还能防止过分调度</strong>。可用线程数量应该取决于可用的并发处理器、处理器内核、内存、网络sockets等的数量。 例如，线程数一般取<code>cpu数量 + 2</code>比较合适，<strong>线程数过多会导致额外的线程切换开销。</strong></p>
+<p>线程池模式一般分为两种：HS/HA半同步/半异步模式、L/F领导者与跟随者模式。</p>
+<ul>
+<li>半同步/半异步模式又称为<strong>生产者消费者模式</strong>，是比较常见的实现方式，比较简单。分为同步层、队列层、异步层三层。同步层的主线程处理工作任务并存入工作队列，工作线程从工作队列取出任务进行处理，如果工作队列为空，则取不到任务的工作线程进入挂起状态。由于线程间有数据通信，因此不适于大数据量交换的场合。</li>
+<li>领导者跟随者模式，在线程池中的线程可处在3种状态之一：领导者leader、追随者follower或工作者processor。任何时刻线程池只有一个领导者线程。事件到达时，领导者线程负责消息分离，并从处于追随者线程中选出一个来当继任领导者，然后将自身设置为工作者状态去处置该事件。处理完毕后工作者线程将自身的状态置为追随者。这一模式实现复杂，但避免了线程间交换任务数据，提高了CPU cache相似性。</li>
+</ul>
+<h3 id="线程池的实现代码"><a href="#线程池的实现代码" class="headerlink" title="线程池的实现代码"></a>线程池的实现代码</h3><p> 在C++中定义一个类时，如果不明确定义拷贝构造函数和拷贝赋值操作符，编译器会自动生成这两个函数。当我们希望禁止拷贝类的实例时，就不能用默认生成的这两个函数。 </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// noncopyable.h</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Created by wuyao on 10/27/20.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> WEBSERVER_NONCOPYABLE_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WEBSERVER_NONCOPYABLE_H</span></span><br><span class="line"><span class="comment">//不可拷贝类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">noncopyable</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    noncopyable(<span class="keyword">const</span> noncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    noncopyable&amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> noncopyable&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    noncopyable() = <span class="keyword">default</span>;</span><br><span class="line">    ~noncopyable() = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//WEBSERVER_NONCOPYABLE_H</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// mutexlock.h</span></span><br><span class="line"><span class="comment">// Created by wuyao on 10/27/20.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> WEBSERVER_MUTEXLOCK_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WEBSERVER_MUTEXLOCK_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"noncopyable.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 继承了noncopyable保证了 显式调用构造函数不会再出现改类型的对象,确保了锁的唯一性</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MutexLock</span> :</span> <span class="keyword">public</span> noncopyable&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    MutexLock()&#123;</span><br><span class="line">        pthread_mutex_init(&amp;m_mxt, <span class="literal">NULL</span>);   <span class="comment">//只是初始化并没有加锁!!</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~MutexLock() &#123;</span><br><span class="line">        pthread_mutex_destroy(&amp;m_mxt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pthread_mutex_lock(&amp;m_mxt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pthread_mutex_unlock(&amp;m_mxt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">pthread_mutex_t</span>* get_mutex_lock()&#123;</span><br><span class="line">        <span class="keyword">return</span> &amp;m_mxt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">pthread_mutex_t</span> m_mxt;          <span class="comment">//互斥量</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自动锁</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MutexGuard</span> :</span> <span class="keyword">public</span> noncopyable&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">//在MutexGuard的构造函数中加锁</span></span><br><span class="line">    MutexGuard(MutexLock&amp; lock):m_Mtx(lock)&#123;</span><br><span class="line">        m_Mtx.lock();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//在MutexGuard的析构函数unlock</span></span><br><span class="line">    ~MutexGuard()&#123;</span><br><span class="line">        m_Mtx.unlock();</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    MutexLock &amp;m_Mtx;           <span class="comment">// 引用</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//WEBSERVER_MUTEXLOCK_H</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// condition.h</span></span><br><span class="line"><span class="comment">// Created by wuyao on 10/27/20.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> WEBSERVER_CONDITION_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WEBSERVER_CONDITION_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MutexLock.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"noncopyable.h"</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Condition</span>&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Condition(MutexLock&amp; mxt): m_mxt(mxt)&#123;</span><br><span class="line">        pthread_cond_init(&amp;m_cond, <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~Condition()&#123;</span><br><span class="line">        pthread_cond_destroy(&amp;m_cond);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//等待条件成立</span></span><br><span class="line">    <span class="comment">// pthread_cond_wait内部的操作顺序是将线程放到等待队列，</span></span><br><span class="line">    <span class="comment">// 然后解锁，等条件满足时重新竞争锁，竞争到后加锁，然后返回。</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">wait</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pthread_cond_wait(&amp;m_cond,m_mxt.get_mutex_lock());</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 唤醒某个线程</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">notify</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pthread_cond_signal(&amp;m_cond);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// 唤醒所有线程</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">notify_all</span><span class="params">()</span></span>&#123;</span><br><span class="line">        pthread_cond_broadcast(&amp;m_cond);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">// 条件变量一定要和mutex一起使用</span></span><br><span class="line">    <span class="comment">// 注意这里使用的是引用</span></span><br><span class="line">    MutexLock&amp; m_mxt;</span><br><span class="line">    <span class="keyword">pthread_cond_t</span> m_cond;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//WEBSERVER_CONDITION_H</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// threadpool.h</span></span><br><span class="line"><span class="comment">// Created by wuyao on 10/27/20.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> WEBSERVER_THREADPOOL_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WEBSERVER_THREADPOOL_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MutexLock.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"Condition.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;list&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;functional&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_THREAD_SIZE 512		</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_REQUEST_SIZE 1024</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> thread&#123;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Task</span>&#123;</span></span><br><span class="line">        <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; process;		<span class="comment">// function C++11的关键字</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">ThreadPool</span>&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        ThreadPool(<span class="keyword">int</span> thread_size);</span><br><span class="line">        ~ThreadPool();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span></span>;						<span class="comment">// 关闭线程池</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">append_task</span><span class="params">(Task*)</span></span>;				<span class="comment">// 添加任务</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;								</span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span>* <span class="title">worker</span><span class="params">(<span class="keyword">void</span> *)</span></span>;			<span class="comment">// 线程执行函数</span></span><br><span class="line"></span><br><span class="line">        MutexLock m_mtx;</span><br><span class="line">        Condition m_cond;</span><br><span class="line">        <span class="keyword">int</span>  m_thread_size;						</span><br><span class="line">        <span class="keyword">int</span>  m_cur_thread_cnt;					<span class="comment">// 当前线程数</span></span><br><span class="line">        <span class="keyword">bool</span> m_shutdown;						<span class="comment">// 是否关闭</span></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">pthread_t</span>&gt; m_thread;		<span class="comment">// 消费者</span></span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">list</span>&lt;Task*&gt; m_requst;				<span class="comment">// 生产者</span></span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">//WEBSERVER_THREADPOOL_H</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// threadpool.cpp</span></span><br><span class="line"><span class="comment">// Created by wuyao on 10/27/20.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"include/ThreadPool.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> thread;</span><br><span class="line"></span><br><span class="line">ThreadPool::ThreadPool(<span class="keyword">int</span> thread_size): m_thread_size(thread_size), m_cond(m_mtx), m_shutdown(<span class="literal">false</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span> (thread_size &lt;= <span class="number">0</span> || thread_size &gt; MAX_THREAD_SIZE)</span><br><span class="line">        thread_size = <span class="number">3</span>;</span><br><span class="line">    m_thread_size = thread_size;</span><br><span class="line">    m_thread.resize(m_thread_size);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m_thread_size; ++i)&#123;</span><br><span class="line">        <span class="keyword">if</span> (pthread_create(&amp;m_thread[i], <span class="literal">NULL</span>, worker, <span class="keyword">this</span>) != <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"pthread_create error! file &lt;"</span>&lt;&lt;__FILE__&lt;&lt;<span class="string">"&gt; at"</span>&lt;&lt;__LINE__&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        m_cur_thread_cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ThreadPool::~ThreadPool()&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ThreadPool::shutdown() &#123;</span><br><span class="line">    <span class="keyword">if</span> (m_shutdown)&#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"Already closed"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_cond.notify_all();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= m_cur_thread_cnt;++i)&#123;</span><br><span class="line">        <span class="keyword">if</span> (pthread_join(m_thread[i], <span class="literal">NULL</span>) != <span class="number">0</span>)</span><br><span class="line">            <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"pthread_join error file &lt;"</span>&lt;&lt;__FILE__&lt;&lt;<span class="string">"&gt; at"</span>&lt;&lt;__LINE__&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_shutdown = <span class="literal">true</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"closed"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span>* ThreadPool::worker(<span class="keyword">void</span> *arg)&#123;</span><br><span class="line">    ThreadPool* pool = <span class="keyword">static_cast</span>&lt;ThreadPool*&gt;(arg);</span><br><span class="line">    <span class="keyword">if</span> (pool == <span class="literal">NULL</span>)   <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    pool-&gt;run();</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ThreadPool::run()&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)&#123;</span><br><span class="line">        Task *tsk = <span class="literal">nullptr</span>;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function">MutexGuard <span class="title">lock</span><span class="params">(m_mtx)</span></span>;</span><br><span class="line">            <span class="comment">// 这里存在一个虚假唤醒的问题</span></span><br><span class="line">            <span class="comment">// 当线程池未关闭且请求队列为空 等待请求队列</span></span><br><span class="line">            <span class="keyword">while</span> (!m_shutdown &amp;&amp; m_requst.empty())</span><br><span class="line">                m_cond.wait();</span><br><span class="line">            tsk = m_requst.front();</span><br><span class="line">            m_requst.pop_front();</span><br><span class="line">            tsk-&gt;process();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (tsk == <span class="literal">nullptr</span>) <span class="keyword">continue</span>;</span><br><span class="line">        <span class="keyword">delete</span>(tsk);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">void</span> ThreadPool::append_task(Task* tsk)&#123;</span><br><span class="line">   <span class="keyword">if</span> (tsk == <span class="literal">nullptr</span>)  <span class="keyword">return</span> ;</span><br><span class="line">   <span class="function">MutexGuard <span class="title">guard</span><span class="params">(m_mtx)</span></span>;</span><br><span class="line">   <span class="keyword">if</span> (m_requst.size() &gt; MAX_REQUEST_SIZE)&#123;</span><br><span class="line">       <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;m_requst.size()&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">       <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"this task request too much!"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">       <span class="keyword">return</span> ;</span><br><span class="line">   &#125;</span><br><span class="line">   m_requst.push_back(tsk);</span><br><span class="line">   <span class="keyword">if</span> (m_requst.size() &gt;= <span class="number">1</span>)</span><br><span class="line">       m_cond.notify();</span><br><span class="line">   <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// main.cpp</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"include/ThreadPool.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> &amp;i)</span></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"print() ==&gt;"</span>&lt;&lt;pthread_self()&lt;&lt;<span class="string">"  "</span>&lt;&lt;i++&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    thread::<span class="function">ThreadPool <span class="title">pool</span><span class="params">(<span class="number">4</span>)</span></span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">        thread::Task* tsk = <span class="keyword">new</span> thread::Task;</span><br><span class="line">        tsk-&gt;process = <span class="built_in">std</span>::bind(print, <span class="built_in">std</span>::ref(i));</span><br><span class="line">        pool.append_task(tsk);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-31_15-17-47.png" alt></p>
+<p><strong>所谓虚假唤醒</strong>,指的是即便我们没有 signal 相关的条件变量(即没有调用 <code>pthread_cond_signal</code>),等待(调用了<code>pthread_cond_wait</code>)的线程也可能被(虚假)唤醒,此时我们必须重新检查对应的标记值(以确认是否发生了(虚假)唤醒),又由于(虚假)唤醒可能会发生多次,所以我们最终需要使用循环来进行标记值检查. </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络编程/" rel="tag"># 网络编程</a>
+          
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/24/LeetCode-1024-视频拼接/" rel="next" title="LeetCode 1024.视频拼接">
+                <i class="fa fa-chevron-left"></i> LeetCode 1024.视频拼接
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/31/内存管理/" rel="prev" title="内存管理">
+                内存管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#RAII是什么？"><span class="nav-text">RAII是什么？</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池是什么？"><span class="nav-text">线程池是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池的实现代码"><span class="nav-text">线程池的实现代码</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

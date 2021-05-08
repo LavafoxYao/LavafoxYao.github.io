@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="OS,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="《Linux内核设计与实现》笔记系列一">
+<meta name="keywords" content="OS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程的创建">
+<meta property="og:url" content="http://yoursite.com/2020/10/15/进程的创建/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="《Linux内核设计与实现》笔记系列一">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6%20%288%29.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-15_20-12-46.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-15_20-14-05.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.143Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程的创建">
+<meta name="twitter:description" content="《Linux内核设计与实现》笔记系列一">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6%20%288%29.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/15/进程的创建/">
+
+
+
+
+
+  <title>进程的创建 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/15/进程的创建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">进程的创建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-15T20:27:21+08:00">
+                2020-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/操作系统/" itemprop="url" rel="index">
+                    <span itemprop="name">操作系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><code>《Linux内核设计与实现》</code>笔记系列一</p>
+<a id="more"></a>
+
+<h1 id="进程创建"><a href="#进程创建" class="headerlink" title="进程创建"></a>进程创建</h1><p>许多其他的操作系统都提供了<code>产生(spawn)</code>进程的机制，<strong>首先在新的地址空间里创建进程，读入可执行文件，最后开始执行。</strong></p>
+<p><code>unix</code>中才用把上述步骤分解为两步:</p>
+<ol>
+<li>fork( )，通过拷贝当前进程创建一个子进程。</li>
+<li>exec( )，负责读取可执行文件并将其载入到地址空间开始运行。</li>
+</ol>
+<h3 id="写时拷贝-copy-on-write-COW"><a href="#写时拷贝-copy-on-write-COW" class="headerlink" title="写时拷贝(copy-on-write  COW)"></a>写时拷贝(copy-on-write  COW)</h3><p><code>Linux</code>中的<code>fork()</code>使用了<code>copy-on-write</code>页实现。</p>
+<p><code>COW</code>只有在需要写入的时候,数据才会被复制,从而使各个进程拥有各自的拷贝。</p>
+<p>具体来说:</p>
+<blockquote>
+<p>​    当进程A使用系统调用<code>fork()</code>创建子进程B时,由于子进程B实际上是父进程A的一个拷贝.因此会拥有与父进程相同的<code>物理页面</code>.为了节约内存和加快进程的创建速度,<code>fork()</code>会让子进程以只读的方式共享父进程A的<code>物理页面</code>,同时也将父进程A对这些<code>物理页面的访问权限设置为只读</code>.这样,当父进程A或子进程B任何一方对这些已共享的物理页面执行写操作时,都会产生页面出错异常<code>(page_fault)</code>中断,此时<code>CPU</code>会执行系统提供的异常处理函数<code>do_wp_page()</code>来解决这个异常.</p>
+<p>​    <code>do_wp_page()</code>会对这块导致写入异常中断的物理页面进行取消共享操作,为写进程复制一份新的<code>物理页面</code>,使得进程A与进程B各自拥有一块相同的物理页面,最后从异常处理函数中返回时,<code>CPU</code>就会重新执行刚才导致异常的写入操作指令,使进程继续下去.</p>
+</blockquote>
+<p><code>fork()</code>的实际开销主要是复制父进程的页表以及子进程创建唯一的<code>task_struct(进程描述符)</code>.在一般情况下,进程创建后会马上运行一个可执行文件,这种优化可以避免拷贝根本不会被使用的数据.</p>
+<h3 id="fork-、vfork-和clone-之间的关系"><a href="#fork-、vfork-和clone-之间的关系" class="headerlink" title="fork()、vfork()和clone() 之间的关系"></a>fork()、vfork()和clone() 之间的关系</h3><p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/%E6%9C%AA%E5%91%BD%E5%90%8D%E6%96%87%E4%BB%B6%20%288%29.png" alt></p>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>fork()</code></td>
+<td><code>fork</code>创造的子进程是父进程的完整副本，复制了父亲进程的资源，包括内存的内容<code>task_struct</code>内容</td>
+</tr>
+<tr>
+<td><code>vfork()</code></td>
+<td><code>vfork</code>创建的子进程与父进程共享数据段,而且由<code>vfork()</code>创建的子进程将先于父进程运行</td>
+</tr>
+<tr>
+<td><code>clone()</code></td>
+<td>linux上创建线程一般使用的是pthread库 实际上linux也给我们提供了创建线程的系统调用，就是clone</td>
+</tr>
+</tbody></table>
+<h4 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> child = fork();</span><br><span class="line">    <span class="keyword">if</span> (child  &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"fork() error!\n"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (child == <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="comment">// child</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"child PID = %d, cnt = %d\n"</span>, getpid(), cnt);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">// parent</span></span><br><span class="line">        cnt ++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"parent PID = %d, cnt = %d\n"</span>, getpid(), cnt);</span><br><span class="line">    &#125;</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-15_20-12-46.png" alt></p>
+<p>从运行结果可以看出父子进程的<code>PID</code>不同，堆栈和数据资源都是完全相同。</p>
+<p>当父进程改变<code>cnt</code>的值并不会影响子进程中的<code>cnt</code>的值。</p>
+<h4 id="vfork"><a href="#vfork" class="headerlink" title="vfork"></a>vfork</h4><p><code>vfork()</code>的做法较之<code>fork()</code>更加粗暴，内核连子进程的虚拟地址空间结构也不创建，直接共享了父进程的虚拟地址空间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> cnt = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> child = vfork();</span><br><span class="line">    <span class="keyword">if</span> (child &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"fork() error!\n"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (child == <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="comment">// child</span></span><br><span class="line">        cnt ++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"child PID = %d, cnt = %d\n"</span>, getpid(), cnt);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        cnt ++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"parent PID = %d, cnt = %d\n"</span>, getpid(), cnt);</span><br><span class="line">    &#125;</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-15_20-14-05.png" alt></p>
+<p><code>vfork()</code>保证了子进程先运行(父进程被挂起),再子进程调用<code>exec</code>和<code>_exit</code>后父进程才有可能被调度.</p>
+<p>从运行结果可以看出: 子进程对<code>cnt</code>加一,父进程中的<code>cnt</code>也加一,说明两者的<code>cnt</code>在同一内存.</p>
+<p>另外在<code>vfork()</code>中退出一定要使用<code>_exit()</code>而不要使用return.</p>
+<p><code>vfork()</code>时父子进程共享数据段,如果<code>vfork()</code>的子进程中使用<code>return</code>,父进程去访问数据将会出现段错误.</p>
+<p>这是因为如果<code>vfork()</code>生成的子进程在函数中使用<code>return</code>就结束了函数,其函数的栈空间全部被系统回收,父进程再去访问原来的数据就访问错误的地址,导致段错误.</p>
+<h5 id="exit-与-return-的区别"><a href="#exit-与-return-的区别" class="headerlink" title="exit 与 return 的区别"></a>exit 与 return 的区别</h5><p><code>exit(0)</code>：正常运行程序并退出程序；</p>
+<p><code>exit(1)</code>：非正常运行导致退出程序；</p>
+<p><code>return()</code>：返回函数，若在主函数中，则会退出函数并返回一个值。]</p>
+<blockquote>
+<p> return是<strong>语言级别</strong>的，它表示了<strong>调用堆栈的返回</strong>；而exit是<strong>系统调用级别</strong>的，它表示了一个<strong>进程的结束</strong>。 </p>
+<p> return是函数的退出(返回)；exit是进程的退出。 </p>
+<p> return用于结束一个函数的执行，将函数的执行信息传出个其他调用函数使用；<strong>exit函数是退出应用程序，删除进程使用的内存空间，并将应用程序的一个状态返回给OS，</strong>这个状态标识了应用程序的一些运行信息，这个信息和机器和操作系统有关，一般是 0 为正常退出，非0 为非正常退出。 </p>
+<p> 非主函数中调用return和exit效果很明显，但是在main函数中调用return和exit的现象就很模糊，多数情况下现象都是一致的。 </p>
+</blockquote>
+<h4 id="linux中的线程"><a href="#linux中的线程" class="headerlink" title="linux中的线程"></a>linux中的线程</h4><p><code>linux</code>中把所有的线程都当做进程来实现,内核并没有特别的调度算法或是定义特别的数据结构来表征线程.<strong>相反，线程仅仅是被视为一个与其他进程共享某些资源的进程。每个线程都拥有唯一隶属自己的<code>task_struct</code>，所以在内核中，它看起来就像一个普通的进程。(只是线程和其他一些进程共享某些资源)</strong></p>
+<p><strong>对于<code>Linux</code>来说，线程只是进程间的一种共享资源的手段(linux中的进程本身已经够轻量级了)</strong>。</p>
+<p><strong><code>linux</code>中线程的实现方式与进程一样，只不过通过对<code>clone()</code>参数指定来使得多个进程之间共享某些资源(如虚拟内存、页表、文件描述符),函数调用栈、寄存器等线程私有数据则独立。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建线程</span></span><br><span class="line">clone(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// fork()的实现</span></span><br><span class="line">clone(SIGCHLD, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// vfork()的实现</span></span><br><span class="line">clone(CLONE_VFORK| CLONE_VM | SIGCHLD, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<h5 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h5><p>在<code>linux</code>中进程和线程实际上都是使用一个结构体<code>task_struct</code>来表示一个执行任务的实体。进程创建调用<code>fork()</code>系统调用，而线程创建则是<code>pthread_create()</code>方法，但是这两个方法最终都会调用<code>do_fork()</code>函数来创建操作，区别就送在传入的参数不同。</p>
+<p>参考链接:</p>
+<p><a href="https://blog.csdn.net/gatieme/article/details/51417488" target="_blank" rel="noopener">https://blog.csdn.net/gatieme/article/details/51417488</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OS/" rel="tag"># OS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/11/LeetCode-416-分割等和子集/" rel="next" title="LeetCode 416.分割等和子集">
+                <i class="fa fa-chevron-left"></i> LeetCode 416.分割等和子集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/17/腾讯云服务器如何开放端口/" rel="prev" title="腾讯云服务器如何开放端口?">
+                腾讯云服务器如何开放端口? <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#进程创建"><span class="nav-text">进程创建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写时拷贝-copy-on-write-COW"><span class="nav-text">写时拷贝(copy-on-write  COW)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fork-、vfork-和clone-之间的关系"><span class="nav-text">fork()、vfork()和clone() 之间的关系</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#fork"><span class="nav-text">fork</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vfork"><span class="nav-text">vfork</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#exit-与-return-的区别"><span class="nav-text">exit 与 return 的区别</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux中的线程"><span class="nav-text">linux中的线程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#进程与线程"><span class="nav-text">进程与线程</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="OS,Linux内核,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="学习《Linux内核设计与实现》笔记系列二 伙伴系统与slab机制. 伙伴系统(buddy 算法)主要解决的是外部碎片问题. slab机制主要解决的是内部碎片问题.">
+<meta name="keywords" content="OS,Linux内核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存管理">
+<meta property="og:url" content="http://yoursite.com/2020/10/31/内存管理/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="学习《Linux内核设计与实现》笔记系列二 伙伴系统与slab机制. 伙伴系统(buddy 算法)主要解决的是外部碎片问题. slab机制主要解决的是内部碎片问题.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/externalFragmentation.gif">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/internalFragmentation.gif">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-30_10-58-45.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%8Eslab.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-30_11-12-35.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.131Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内存管理">
+<meta name="twitter:description" content="学习《Linux内核设计与实现》笔记系列二 伙伴系统与slab机制. 伙伴系统(buddy 算法)主要解决的是外部碎片问题. slab机制主要解决的是内部碎片问题.">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/externalFragmentation.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/31/内存管理/">
+
+
+
+
+
+  <title>内存管理 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/31/内存管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">内存管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-31T10:13:25+08:00">
+                2020-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/操作系统/" itemprop="url" rel="index">
+                    <span itemprop="name">操作系统</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>学习<code>《Linux内核设计与实现》</code>笔记系列二</p>
+<p>伙伴系统与slab机制.</p>
+<p>伙伴系统(buddy 算法)主要解决的是外部碎片问题.</p>
+<p>slab机制主要解决的是内部碎片问题.</p>
+<a id="more"></a>
+
+<h3 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h3><p>学习伙伴系统与slab机制.</p>
+<p>伙伴系统(buddy 算法)主要解决的是外部碎片问题.</p>
+<p>slab机制主要解决的是内部碎片问题.</p>
+<!--more-->
+
+<p><code>外部碎片</code>:外部碎片是指还没有被分配出去(不属于任何进程)的内存块,但是由于太小了无法分配给申请内存空间的新进程的内存空闲区域,即处于两个已分配区域或页面之间的空闲存储块.这些存储块的综合可以满足当前申请长度的要求,但是由于它们的地址不连续或其他原因,使得系统无法满足当前申请要求.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/externalFragmentation.gif" alt></p>
+<p><code>内部碎片</code>:内部碎片是指已被分配出去的内存空间(<strong>能明确的指明出该碎片属于哪个进程</strong>)大于请求所需的内存空间,不能被利用的内存空间就是内部碎片.内部碎片是出于区域内部或页面内部的存储块.占有这些区域或页面的进程并不使用这个存储块.而在进程占用这块存储块时,系统无法利用它.直到进程释放它,或进程结束时,系统才有可能利用这个存储块.</p>
+<p>简单的解释就是:当我们申请几十字节的时候,内核也是给我们分配一个页,这样每个页中就形成很大的浪费,称之为内部碎片.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/internalFragmentation.gif" alt></p>
+<h3 id="伙伴算法-Buddy"><a href="#伙伴算法-Buddy" class="headerlink" title="伙伴算法(Buddy)"></a>伙伴算法(Buddy)</h3><p><strong>伙伴算法（Buddy system）</strong>把所有的空闲页框分为<strong>11个块链表</strong>，每块链表中分布包含特定的连续页框地址空间，第0个块链表包含大小为2 ^ 0个连续的页框，第1个块链表中，每个链表元素包含<code>2 ^ 1</code>个页框大小的连续地址空间，….，第10个块链表中，每个链表元素包含2 ^ 10个页框大小的连续地址空间。每个链表中元素的个数在系统初始化时决定，在执行过程中，动态变化。</p>
+<p>伙伴算法每次只能分配2的幂次页的空间，比如一次分配1页，2页，4页，8页，…，1024页<code>(2^10)</code>等等，<strong>每页(pageSize)大小一般为4K</strong>(一般而言, 32位系统是4K ,64位系统是8K)，因此，伙伴算法最多一次能够分配<code>4M</code>的内存空间。</p>
+<p>用一个简单的例子来说明该算法的工作原理.</p>
+<blockquote>
+<p>例如我们需要一个<code>256个(2^8)</code>页框的块.算法首先会在第9个链表块中查找是否有这样一个空闲块.如果没有的话,就会去下一个更大的链表快中查找,也就是到512个页框大小的链表中找空闲块.如果存在这样的块,那么内核就会把512个页框大小的块分成两等分,一个用作满足申请的需求,另一个则插入到256个页框的链表中.若在512个页框中也没找到空闲块,就继续找更大的块–1024个页框的块.如果这样的块存在,内核就把1024的块分粉为2个256,一个512的页框,一个256的页框用作申请,另外两块分别插入到256页框的链表中和512页框的链表中.若1024个页框的链表也为空,算法就放弃并发出错误的信号.</p>
+</blockquote>
+<p>当程序释放内存时,操作系统先将内存回收,然后检查与该内存相邻的内存是否是同样大小并且处于空闲状态,如果是,则将这两块内存合并,然后程序递归进行同样的检查.</p>
+<p>下面通过一个例子来解释伙伴算法回收内存.</p>
+<p> 假设系统中有 1MB 大小的内存需要动态管理，按照伙伴算法的要求：需要将这1M大小的内存进行划分。这里，我们将这1M的内存分为 64K、64K、128K、256K、和512K 共五个部分，如下图所示</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-30_10-58-45.png" alt></p>
+<ol>
+<li>此时，如果有一个程序A想要申请一块45K大小的内存，则系统会将第一块64K的内存块分配给该程序（产生内部碎片为代价），如图b所示；</li>
+<li>然后程序B向系统申请一块68K大小的内存，系统会将128K内存分配给该程序，如图c所示；</li>
+<li>接下来，程序C要申请一块大小为35K的内存。系统将空闲的64K内存分配给该程序，如图d所示；</li>
+<li>之后程序D需要一块大小为90K的内存。当程序提出申请时，系统本该分配给程序D一块128K大小的内存，但此时内存中已经没有空闲的128K内存块了，于是根据伙伴算法的原理，系统会将256K大小的内存块平分，将其中一块分配给程序D，另一块作为空闲内存块保留，等待以后使用，如图e所示；</li>
+<li>紧接着，程序C释放了它申请的64K内存。在内存释放的同时，系统还负责检查与之相邻并且同样大小的内存是否也空闲，由于此时程序A并没有释放它的内存，所以系统只会将程序C的64K内存回收，如图f所示；</li>
+<li>然后程序A也释放掉由它申请的64K内存，系统随机发现与之相邻且大小相同的一段内存块恰好也处于空闲状态。于是，将两者合并成128K内存，如图g所示；</li>
+<li>之后程序B释放掉它的128k，系统也将这块内存与相邻的128K内存合并成256K的空闲内存，如图h所示；</li>
+<li>最后程序D也释放掉它的内存，经过三次合并后，系统得到了一块1024K的完整内存，如图i所示。</li>
+</ol>
+<h3 id="slab分配器"><a href="#slab分配器" class="headerlink" title="slab分配器"></a>slab分配器</h3><h5 id="灵魂一问，为什么要有slab"><a href="#灵魂一问，为什么要有slab" class="headerlink" title="灵魂一问，为什么要有slab?"></a>灵魂一问，为什么要有slab?</h5><blockquote>
+<p>因为在linux内核中的内存管理是使用的伙伴系统，但是这个系统有个问题就是它的最小单元一般为4KB。但是很多情况下，我们需要分配的单元大小是远小于4K的，如果使用伙伴系统的话，必定就会产生很大的浪费。所以，一个粒度更小的分配器就呼之欲出，slab就是为了解决这种小粒度内存分配的内问题。</p>
+</blockquote>
+<p>slab分配器扮演的了通用数据结构缓存层的角色.</p>
+<ul>
+<li>频繁使用的数据结构也会频繁分配和释放,因此应当缓存它们</li>
+<li>分配和回收必然会导致内部碎片.为了避免这种现象,空闲链表的缓存会连续地存放.因为已释放的数据结构又会放回空闲链表,因此不会导致碎片.</li>
+<li>回收的对象可以立即投入下一次分配.</li>
+</ul>
+<p>slab层通常需要满足这样两个条件</p>
+<ol>
+<li>当某一个子系统频繁的申请和释放内存</li>
+<li>利用slab申请的内存大小必须是固定的</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># slab 描述符</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">slab</span>&#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">list</span>;</span>		<span class="comment">//	满、部分满或空链表</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> colouroff;		<span class="comment">//	slab着色的偏移量</span></span><br><span class="line">  <span class="keyword">void</span> *s_mem;					<span class="comment">//	在slab中的第一个对象</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> inuse;			<span class="comment">//	slab中已分配的对象数</span></span><br><span class="line">  <span class="keyword">kmem_bufctl_t</span> <span class="built_in">free</span>;			<span class="comment">//  第一个空闲对象</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>slab 层把不同的对象划分为所谓高速缓存组，其中每个高速缓存组都存放不同类型的对象，每种对象类型对应一个高速缓存。例如，一个高速缓存用于存放进程描述符，而另一个高速缓存存放索引节点对象，然后这些高速缓存又被划分为 slab。slab 由一个或多个物理上连续的页组成。一般情况下，slab 也就是仅仅由一页组成，每个高速缓存可以由多个 slab 组成。 </p>
+<p>
+<img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%8Eslab.png" style="zoom: 33%;">
+</p>
+
+
+<p>slab 分配器把每一个请求的内存称之为对象。每个 slab 都包含一些对象成员，这里的对象指的是被缓存的数据结构。每个 slab 处于三种状态之一：满、部分满或空。一个满的 slab 没有空闲的对象（slab 中的对象都已被分配）。一个空的 slab 没有分配出任何对象（slab 中所有对象都是空闲的）。一个部分满的 slab 有一些对象已分配出去，有些对象还空闲着。当内核的某一部分需要一个新的对象时，先从部分满的 slab 中进行分配，如果没有部分满的 slab，就从空的 slab 中进行分配。如果没有空的 slab，就要创建一个 slab 了。</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/10/Snipaste_2020-10-30_11-12-35.png" alt></p>
+<p>slab分配器是基于对象管理的.相同对象归于一类,每当要申请一个对象时,slab分配器就从一个slab链表中分配一个这样大小的单元出去,而当要释放时,将其重新保留在该列表中,而不是直接返回给伙伴系统,从而避免内部碎片.slab分配器并不丢弃已分配的对象,而是释放并把它们保留在内存中.<strong>slab分配对象时,会使用最近释放的对象内存块,因此其驻留在CPU缓存中的概率会大大提高.</strong></p>
+<hr>
+<p>参考链接<br><a href="https://blog.csdn.net/wenqian1991/article/details/27968779" target="_blank" rel="noopener">【Linux 内核】内存管理（二）伙伴算法</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OS/" rel="tag"># OS</a>
+          
+            <a href="/tags/Linux内核/" rel="tag"># Linux内核</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/29/运用RAII的方式实现线程池/" rel="next" title="运用RAII的方式实现线程池">
+                <i class="fa fa-chevron-left"></i> 运用RAII的方式实现线程池
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/01/LeetCode-139-单词拆分/" rel="prev" title="LeetCode 139.单词拆分">
+                LeetCode 139.单词拆分 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#内存管理"><span class="nav-text">内存管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#伙伴算法-Buddy"><span class="nav-text">伙伴算法(Buddy)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slab分配器"><span class="nav-text">slab分配器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#灵魂一问，为什么要有slab"><span class="nav-text">灵魂一问，为什么要有slab?</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

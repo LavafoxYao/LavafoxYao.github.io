@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ONE平台,源码,JAVA,机会网络,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="做机会网络方面的研究，到后期试验肯定是要对当前路由算法的源码进行改进，ActiveRouter.java是其他所有基本路由算法的基础，我对下面的源码进行了注释，未注释的部分要么功能已经被函数名表达出来了，要么可能是我理解不够没有注释到位。 由于代码较长，函数较多，我这里就没分出来一个个讲解而是全部展现出来。">
+<meta name="keywords" content="ONE平台,源码,JAVA,机会网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The ONE笔记:ActiveRouter.java源码阅读">
+<meta property="og:url" content="http://yoursite.com/2020/08/10/The-ONE笔记-ActiveRouter-java源码阅读/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="做机会网络方面的研究，到后期试验肯定是要对当前路由算法的源码进行改进，ActiveRouter.java是其他所有基本路由算法的基础，我对下面的源码进行了注释，未注释的部分要么功能已经被函数名表达出来了，要么可能是我理解不够没有注释到位。 由于代码较长，函数较多，我这里就没分出来一个个讲解而是全部展现出来。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.130Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The ONE笔记:ActiveRouter.java源码阅读">
+<meta name="twitter:description" content="做机会网络方面的研究，到后期试验肯定是要对当前路由算法的源码进行改进，ActiveRouter.java是其他所有基本路由算法的基础，我对下面的源码进行了注释，未注释的部分要么功能已经被函数名表达出来了，要么可能是我理解不够没有注释到位。 由于代码较长，函数较多，我这里就没分出来一个个讲解而是全部展现出来。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/10/The-ONE笔记-ActiveRouter-java源码阅读/">
+
+
+
+
+
+  <title>The ONE笔记:ActiveRouter.java源码阅读 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/10/The-ONE笔记-ActiveRouter-java源码阅读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">The ONE笔记:ActiveRouter.java源码阅读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-10T14:21:17+08:00">
+                2020-08-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机会网路/" itemprop="url" rel="index">
+                    <span itemprop="name">机会网路</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>做机会网络方面的研究，到后期试验肯定是要对当前路由算法的源码进行改进，<code>ActiveRouter.java</code>是其他所有基本路由算法的基础，我对下面的源码进行了注释，未注释的部分要么功能已经被函数名表达出来了，要么可能是我理解不够没有注释到位。</p>
+<p>由于代码较长，函数较多，我这里就没分出来一个个讲解而是全部展现出来。</p>
+<a id="more"></a>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br><span class="line">659</span><br><span class="line">660</span><br><span class="line">661</span><br><span class="line">662</span><br><span class="line">663</span><br><span class="line">664</span><br><span class="line">665</span><br><span class="line">666</span><br><span class="line">667</span><br><span class="line">668</span><br><span class="line">669</span><br><span class="line">670</span><br><span class="line">671</span><br><span class="line">672</span><br><span class="line">673</span><br><span class="line">674</span><br><span class="line">675</span><br><span class="line">676</span><br><span class="line">677</span><br><span class="line">678</span><br><span class="line">679</span><br><span class="line">680</span><br><span class="line">681</span><br><span class="line">682</span><br><span class="line">683</span><br><span class="line">684</span><br><span class="line">685</span><br><span class="line">686</span><br><span class="line">687</span><br><span class="line">688</span><br><span class="line">689</span><br><span class="line">690</span><br><span class="line">691</span><br><span class="line">692</span><br><span class="line">693</span><br><span class="line">694</span><br><span class="line">695</span><br><span class="line">696</span><br><span class="line">697</span><br><span class="line">698</span><br><span class="line">699</span><br><span class="line">700</span><br><span class="line">701</span><br><span class="line">702</span><br><span class="line">703</span><br><span class="line">704</span><br><span class="line">705</span><br><span class="line">706</span><br><span class="line">707</span><br><span class="line">708</span><br><span class="line">709</span><br><span class="line">710</span><br><span class="line">711</span><br><span class="line">712</span><br><span class="line">713</span><br><span class="line">714</span><br><span class="line">715</span><br><span class="line">716</span><br><span class="line">717</span><br><span class="line">718</span><br><span class="line">719</span><br><span class="line">720</span><br><span class="line">721</span><br><span class="line">722</span><br><span class="line">723</span><br><span class="line">724</span><br><span class="line">725</span><br><span class="line">726</span><br><span class="line">727</span><br><span class="line">728</span><br><span class="line">729</span><br><span class="line">730</span><br><span class="line">731</span><br><span class="line">732</span><br><span class="line">733</span><br><span class="line">734</span><br><span class="line">735</span><br><span class="line">736</span><br><span class="line">737</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * Copyright 2010 Aalto University, ComNet</span></span><br><span class="line"><span class="comment"> * Released under GPLv3. See LICENSE.txt for details. </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">package</span> routing;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> routing.util.EnergyModel;</span><br><span class="line"><span class="keyword">import</span> routing.util.MessageTransferAcceptPolicy;</span><br><span class="line"><span class="keyword">import</span> routing.util.RoutingInfo;</span><br><span class="line"><span class="keyword">import</span> util.Tuple;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> core.Connection;</span><br><span class="line"><span class="keyword">import</span> core.DTNHost;</span><br><span class="line"><span class="keyword">import</span> core.Message;</span><br><span class="line"><span class="keyword">import</span> core.MessageListener;</span><br><span class="line"><span class="keyword">import</span> core.NetworkInterface;</span><br><span class="line"><span class="keyword">import</span> core.Settings;</span><br><span class="line"><span class="keyword">import</span> core.SimClock;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Superclass of active routers. Contains convenience methods (e.g. </span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> #getNextMessageToRemove(boolean)&#125;) and watching of sending connections (see</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> #update()&#125;).</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ActiveRouter</span> <span class="keyword">extends</span> <span class="title">MessageRouter</span> </span>&#123;</span><br><span class="line">	<span class="comment">/** Delete delivered messages -setting id (&#123;<span class="doctag">@value</span>&#125;). Boolean valued.</span></span><br><span class="line"><span class="comment">	 * If set to true and final recipient of a message rejects it because it</span></span><br><span class="line"><span class="comment">	 * already has it, the message is deleted from buffer. Default=false. */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DELETE_DELIVERED_S = <span class="string">"deleteDelivered"</span>;</span><br><span class="line">	<span class="comment">/** should messages that final recipient marks as delivered be deleted</span></span><br><span class="line"><span class="comment">	 * from message buffer */</span></span><br><span class="line">	<span class="comment">// 最后接受者置deleteDelivered为true,并拒绝接受说明其已经拥有该消息</span></span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">boolean</span> deleteDelivered;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/** prefix of all response message IDs */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String RESPONSE_PREFIX = <span class="string">"R_"</span>;</span><br><span class="line">	<span class="comment">/** how often TTL check (discarding old messages) is performed */</span></span><br><span class="line">    <span class="comment">// 60S检查一次TTL</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> TTL_CHECK_INTERVAL = <span class="number">60</span>;		</span><br><span class="line">	<span class="comment">/** connection(s) that are currently used for sending */</span></span><br><span class="line">	<span class="keyword">protected</span> ArrayList&lt;Connection&gt; sendingConnections;				</span><br><span class="line">	<span class="comment">/** sim time when the last TTL check was done */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">double</span> lastTtlCheck;</span><br><span class="line">    </span><br><span class="line">	<span class="comment">// 消息转发协议				</span></span><br><span class="line">	<span class="keyword">private</span> MessageTransferAcceptPolicy policy;</span><br><span class="line">    <span class="comment">// 能量</span></span><br><span class="line">	<span class="keyword">private</span> EnergyModel energy;					  			</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Constructor. Creates a new message router based on the settings in</span></span><br><span class="line"><span class="comment">	 * the given Settings object.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> s The settings object</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">    <span class="comment">// 路由基本配置需要从default.txt中读取</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ActiveRouter</span><span class="params">(Settings s)</span> </span>&#123;						</span><br><span class="line">	<span class="comment">// 调用父类 MessagerRouter的默认默认构造函数</span></span><br><span class="line">        <span class="keyword">super</span>(s);										</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">this</span>.policy = <span class="keyword">new</span> MessageTransferAcceptPolicy(s);</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">this</span>.deleteDelivered = s.getBoolean(DELETE_DELIVERED_S, <span class="keyword">false</span>);</span><br><span class="line">		<span class="comment">// 如果 default.txt 包含 EnergyModel.INIT_ENERGY_S </span></span><br><span class="line">		<span class="keyword">if</span> (s.contains(EnergyModel.INIT_ENERGY_S)) &#123;  		</span><br><span class="line">			<span class="keyword">this</span>.energy = <span class="keyword">new</span> EnergyModel(s);		  		</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">this</span>.energy = <span class="keyword">null</span>; <span class="comment">/* no energy model */</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Copy constructor.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> r The router prototype where setting values are copied from</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="title">ActiveRouter</span><span class="params">(ActiveRouter r)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(r);</span><br><span class="line">		<span class="keyword">this</span>.deleteDelivered = r.deleteDelivered;</span><br><span class="line">		<span class="keyword">this</span>.policy = r.policy;</span><br><span class="line">		<span class="keyword">this</span>.energy = (r.energy != <span class="keyword">null</span> ? r.energy.replicate() : <span class="keyword">null</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(DTNHost host, List&lt;MessageListener&gt; mListeners)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.init(host, mListeners);</span><br><span class="line">		<span class="keyword">this</span>.sendingConnections = <span class="keyword">new</span> ArrayList&lt;Connection&gt;(<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">this</span>.lastTtlCheck = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Called when a connection's state changes. If energy modeling is enabled,</span></span><br><span class="line"><span class="comment">	 * and a new connection is created to this node, reduces the energy for the</span></span><br><span class="line"><span class="comment">	 * device discovery (scan response) amount</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> <span class="doctag">@con</span> The connection whose state changed</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">changedConnection</span><span class="params">(Connection con)</span> </span>&#123;</span><br><span class="line">			<span class="comment">// con.isUp()  链接成功 则return true </span></span><br><span class="line">			<span class="comment">// con.isInitiator() 如果getHost()是发起者则返回true</span></span><br><span class="line">			<span class="comment">// 很好理解就是如果传送消息的节点不是发起者本身则消减能量(因为接受了新的消息)</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.energy != <span class="keyword">null</span> &amp;&amp; con.isUp() &amp;&amp; !con.isInitiator(getHost())) &#123;</span><br><span class="line">			<span class="keyword">this</span>.energy.reduceDiscoveryEnergy();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 如果本节点没有消息的目的节点是邻居节点，那么看看邻居节点是否有消息的目的节点在本节点</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">requestDeliverableMessages</span><span class="params">(Connection con)</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 如果this.isTransferring() 该节点正在传送数据或未完成则return true;</span></span><br><span class="line">		<span class="keyword">if</span> (isTransferring()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// getOtherNode(getHost())	con ==&gt;链接 getHost(); </span></span><br><span class="line">		<span class="comment">// 然后返回con节点</span></span><br><span class="line">		DTNHost other = con.getOtherNode(getHost());</span><br><span class="line">		<span class="comment">/* do a copy to avoid concurrent modification exceptions </span></span><br><span class="line"><span class="comment">		 * (startTransfer may remove messages) */</span></span><br><span class="line">		ArrayList&lt;Message&gt; temp = </span><br><span class="line">			<span class="keyword">new</span> ArrayList&lt;Message&gt;(<span class="keyword">this</span>.getMessageCollection());</span><br><span class="line">		<span class="keyword">for</span> (Message m : temp) &#123;</span><br><span class="line">			<span class="keyword">if</span> (other == m.getTo()) &#123;</span><br><span class="line">				<span class="comment">// startTransfer(m ,con) 将消息m尝试传递给con</span></span><br><span class="line">				<span class="keyword">if</span> (startTransfer(m, con) == RCV_OK) &#123;</span><br><span class="line">					<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span> </span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">createNewMessage</span><span class="params">(Message m)</span> </span>&#123;</span><br><span class="line">		makeRoomForNewMessage(m.getSize());</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">super</span>.createNewMessage(m);	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">receiveMessage</span><span class="params">(Message m, DTNHost from)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> recvCheck = checkReceiving(m, from); </span><br><span class="line">		<span class="keyword">if</span> (recvCheck != RCV_OK) &#123;</span><br><span class="line">			<span class="keyword">return</span> recvCheck;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// seems OK, start receiving the message</span></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">super</span>.receiveMessage(m, from);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// id 为传送消息的id,用来找到message</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Message <span class="title">messageTransferred</span><span class="params">(String id, DTNHost from)</span> </span>&#123;</span><br><span class="line">		Message m = <span class="keyword">super</span>.messageTransferred(id, from);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/**</span></span><br><span class="line"><span class="comment">		 *  N.B. With application support the following if-block</span></span><br><span class="line"><span class="comment">		 *  becomes obsolete, and the response size should be configured </span></span><br><span class="line"><span class="comment">		 *  to zero.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="comment">// check if msg was for this host and a response was requested</span></span><br><span class="line">		<span class="comment">// 查看这个消息是否给这个host</span></span><br><span class="line">		<span class="keyword">if</span> (m.getTo() == getHost() &amp;&amp; m.getResponseSize() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="comment">// generate a response message</span></span><br><span class="line">			Message res = <span class="keyword">new</span> Message(<span class="keyword">this</span>.getHost(),m.getFrom(), </span><br><span class="line">					RESPONSE_PREFIX+m.getId(), m.getResponseSize());</span><br><span class="line">			<span class="keyword">this</span>.createNewMessage(res);</span><br><span class="line">			<span class="keyword">this</span>.getMessage(RESPONSE_PREFIX+m.getId()).setRequest(m);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> m;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns a list of connections this host currently has with other hosts.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> a list of connections this host currently has with other hosts</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 返回当前节点的邻居节点</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> List&lt;Connection&gt; <span class="title">getConnections</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> getHost().getConnections();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to start a transfer of message using a connection. Is starting</span></span><br><span class="line"><span class="comment">	 * succeeds, the connection is added to the watch list of active connections</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> m The message to transfer</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> con The connection to use</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> the value returned by </span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> Connection#startTransfer(DTNHost, Message)&#125;</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 开始尝试连接,将被链接的节点添加到邻居表中,然后将消息m传递给con</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">startTransfer</span><span class="params">(Message m, Connection con)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> retVal;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span> (!con.isReadyForTransfer()) &#123;</span><br><span class="line">			<span class="keyword">return</span> TRY_LATER_BUSY;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span> (!policy.acceptSending(getHost(), </span><br><span class="line">				con.getOtherNode(getHost()), con, m)) &#123;</span><br><span class="line">			<span class="keyword">return</span> MessageRouter.DENIED_POLICY;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		retVal = con.startTransfer(getHost(), m);</span><br><span class="line">		<span class="keyword">if</span> (retVal == RCV_OK) &#123; <span class="comment">// started transfer</span></span><br><span class="line">			addToSendingConnections(con);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (deleteDelivered &amp;&amp; retVal == DENIED_OLD &amp;&amp; </span><br><span class="line">				m.getTo() == con.getOtherNode(<span class="keyword">this</span>.getHost())) &#123;</span><br><span class="line">			<span class="comment">/* final recipient has already received the msg -&gt; delete it */</span></span><br><span class="line">			<span class="keyword">this</span>.deleteMessage(m.getId(), <span class="keyword">false</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> retVal;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Makes rudimentary checks (that we have at least one message and one</span></span><br><span class="line"><span class="comment">	 * connection) about can this router start transfer.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> True if router can start transfer, false if not</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="comment">// 判断是否能够传送消息(有消息存在并且存在至少一条消息链路);</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">canStartTransfer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// getNrofMessages() 返回这个node的消息数目</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.getNrofMessages() == <span class="number">0</span>) &#123;		</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.getConnections().size() == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Checks if router "wants" to start receiving message (i.e. router </span></span><br><span class="line"><span class="comment">	 * isn't transferring, doesn't have the message and has room for it).</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> m The message to check</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> A return code similar to </span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> MessageRouter#receiveMessage(Message, DTNHost)&#125;, i.e. </span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> MessageRouter#RCV_OK&#125; if receiving seems to be OK, </span></span><br><span class="line"><span class="comment">	 * TRY_LATER_BUSY if router is transferring, DENIED_OLD if the router</span></span><br><span class="line"><span class="comment">	 * is already carrying the message or it has been delivered to</span></span><br><span class="line"><span class="comment">	 * this router (as final recipient), or DENIED_NO_SPACE if the message</span></span><br><span class="line"><span class="comment">	 * does not fit into buffer</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 检查本节点是否想开始接受新消息(从from);根据不同的情况返回不同的返回码</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">checkReceiving</span><span class="params">(Message m, DTNHost from)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (isTransferring()) &#123;</span><br><span class="line">			<span class="keyword">return</span> TRY_LATER_BUSY; <span class="comment">// only one connection at a time</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 已经有了该消息</span></span><br><span class="line">		<span class="keyword">if</span> ( hasMessage(m.getId()) || isDeliveredMessage(m) ||</span><br><span class="line">				<span class="keyword">super</span>.isBlacklistedMessage(m.getId())) &#123;		</span><br><span class="line">			<span class="keyword">return</span> DENIED_OLD; <span class="comment">// already seen this message -&gt; reject it</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// m的ttl为小于等于0</span></span><br><span class="line">		<span class="keyword">if</span> (m.getTtl() &lt;= <span class="number">0</span> &amp;&amp; m.getTo() != getHost()) &#123;		</span><br><span class="line">			<span class="comment">/* TTL has expired and this host is not the final recipient */</span></span><br><span class="line">			<span class="keyword">return</span> DENIED_TTL; </span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//没有能量</span></span><br><span class="line">		<span class="keyword">if</span> (energy != <span class="keyword">null</span> &amp;&amp; energy.getEnergy() &lt;= <span class="number">0</span>) &#123;		</span><br><span class="line">			<span class="keyword">return</span> MessageRouter.DENIED_LOW_RESOURCES;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span> (!policy.acceptReceiving(from, getHost(), m)) &#123;		</span><br><span class="line">			<span class="keyword">return</span> MessageRouter.DENIED_POLICY;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//缓存不够</span></span><br><span class="line">		<span class="comment">/* remove oldest messages but not the ones being sent */</span></span><br><span class="line">		<span class="keyword">if</span> (!makeRoomForMessage(m.getSize())) &#123;					</span><br><span class="line">			<span class="keyword">return</span> DENIED_NO_SPACE; <span class="comment">// couldn't fit into buffer -&gt; reject</span></span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> RCV_OK;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/** </span></span><br><span class="line"><span class="comment">	 * Removes messages from the buffer (oldest first) until</span></span><br><span class="line"><span class="comment">	 * there's enough space for the new message.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> size Size of the new message </span></span><br><span class="line"><span class="comment">	 * transferred, the transfer is aborted before message is removed</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> True if enough space could be freed, false if not</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	</span><br><span class="line">	 <span class="comment">//从缓冲区中删除消息（从最旧到最新），直到有足够的空间容纳新消息。</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">makeRoomForMessage</span><span class="params">(<span class="keyword">int</span> size)</span></span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (size &gt; <span class="keyword">this</span>.getBufferSize()) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// message too big for the buffer</span></span><br><span class="line">		&#125;</span><br><span class="line">			</span><br><span class="line">		<span class="keyword">int</span> freeBuffer = <span class="keyword">this</span>.getFreeBufferSize();</span><br><span class="line">		<span class="comment">/* delete messages from the buffer until there's enough space */</span></span><br><span class="line">		<span class="keyword">while</span> (freeBuffer &lt; size) &#123;</span><br><span class="line">			Message m = getNextMessageToRemove(<span class="keyword">true</span>); <span class="comment">// don't remove msgs being sent</span></span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (m == <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// couldn't remove any more messages</span></span><br><span class="line">			&#125;			</span><br><span class="line">			</span><br><span class="line">			<span class="comment">/* delete message from the buffer as "drop" */</span></span><br><span class="line">			deleteMessage(m.getId(), <span class="keyword">true</span>);</span><br><span class="line">			freeBuffer += m.getSize();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Drops messages whose TTL is less than zero.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dropExpiredMessages</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		Message[] messages = getMessageCollection().toArray(<span class="keyword">new</span> Message[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;messages.length; i++) &#123;</span><br><span class="line">			<span class="keyword">int</span> ttl = messages[i].getTtl(); </span><br><span class="line">			<span class="keyword">if</span> (ttl &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">				deleteMessage(messages[i].getId(), <span class="keyword">true</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to make room for a new message. Current implementation simply</span></span><br><span class="line"><span class="comment">	 * calls &#123;<span class="doctag">@link</span> #makeRoomForMessage(int)&#125; and ignores the return value.</span></span><br><span class="line"><span class="comment">	 * Therefore, if the message can't fit into buffer, the buffer is only </span></span><br><span class="line"><span class="comment">	 * cleared from messages that are not being sent.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> size Size of the new message</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">makeRoomForNewMessage</span><span class="params">(<span class="keyword">int</span> size)</span> </span>&#123;</span><br><span class="line">		makeRoomForMessage(size);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns the oldest (by receive time) message in the message buffer </span></span><br><span class="line"><span class="comment">	 * (that is not being sent if excludeMsgBeingSent is true).</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> excludeMsgBeingSent If true, excludes message(s) that are</span></span><br><span class="line"><span class="comment">	 * being sent from the oldest message check (i.e. if oldest message is</span></span><br><span class="line"><span class="comment">	 * being sent, the second oldest message is returned)</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> The oldest message or null if no message could be returned</span></span><br><span class="line"><span class="comment">	 * (no messages in buffer or all messages in buffer are being sent and</span></span><br><span class="line"><span class="comment">	 * exludeMsgBeingSent is true)</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="comment">// 返回消息缓冲区中最早的消息（按接收时间）	如果excludeMsgBeingSent为true，则不会发送</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Message <span class="title">getNextMessageToRemove</span><span class="params">(<span class="keyword">boolean</span> excludeMsgBeingSent)</span> </span>&#123;</span><br><span class="line">		Collection&lt;Message&gt; messages = <span class="keyword">this</span>.getMessageCollection();</span><br><span class="line">		Message oldest = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">for</span> (Message m : messages) &#123;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">if</span> (excludeMsgBeingSent &amp;&amp; isSending(m.getId())) &#123;</span><br><span class="line">				<span class="keyword">continue</span>; <span class="comment">// skip the message(s) that router is sending</span></span><br><span class="line">			&#125;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">if</span> (oldest == <span class="keyword">null</span> ) &#123;</span><br><span class="line">				oldest = m;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (oldest.getReceiveTime() &gt; m.getReceiveTime()) &#123;</span><br><span class="line">				oldest = m;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> oldest;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns a list of message-connections tuples of the messages whose</span></span><br><span class="line"><span class="comment">	 * recipient is some host that we're connected to at the moment.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> a list of message-connections tuples</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// </span></span><br><span class="line">	 <span class="comment">// 返回本节点缓冲区的那些目的节点在其邻居节点的消息，这些消息只要投递成功，就成功达到目的节点。</span></span><br><span class="line">	<span class="keyword">protected</span> List&lt;Tuple&lt;Message, Connection&gt;&gt; getMessagesForConnected() &#123;</span><br><span class="line">        <span class="comment">// 如果节点的消息和邻居数目为0</span></span><br><span class="line">		<span class="keyword">if</span> (getNrofMessages() == <span class="number">0</span> || getConnections().size() == <span class="number">0</span>) &#123;		</span><br><span class="line">			<span class="comment">/* no messages -&gt; empty list */</span></span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;Tuple&lt;Message, Connection&gt;&gt;(<span class="number">0</span>); </span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		List&lt;Tuple&lt;Message, Connection&gt;&gt; forTuples = </span><br><span class="line">			<span class="keyword">new</span> ArrayList&lt;Tuple&lt;Message, Connection&gt;&gt;();</span><br><span class="line">        	<span class="comment">// 去遍历当前节点的消息集合</span></span><br><span class="line">		<span class="keyword">for</span> (Message m : getMessageCollection()) &#123;</span><br><span class="line">            <span class="comment">// 将消息传递给邻居</span></span><br><span class="line">			<span class="keyword">for</span> (Connection con : getConnections()) &#123;		</span><br><span class="line">				DTNHost to = con.getOtherNode(getHost());</span><br><span class="line">                <span class="comment">// m.geto() 的返回值为消息最初到达的节点</span></span><br><span class="line">                <span class="comment">// 说明m成功发送给to</span></span><br><span class="line">				<span class="keyword">if</span> (m.getTo() == to) &#123;</span><br><span class="line">                <span class="comment">// tuple功能类似于cpp中的pair&lt;type A,type B&gt;</span></span><br><span class="line">					forTuples.add(<span class="keyword">new</span> Tuple&lt;Message, Connection&gt;(m,con));	</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> forTuples;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to send messages for the connections that are mentioned</span></span><br><span class="line"><span class="comment">	 * in the Tuples in the order they are in the list until one of</span></span><br><span class="line"><span class="comment">	 * the connections starts transferring or all tuples have been tried.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> tuples The tuples to try</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> The tuple whose connection accepted the message or null if</span></span><br><span class="line"><span class="comment">	 * none of the connections accepted the message that was meant for them.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 尝试给邻居节点发送消息,从消息队列中发送消息,</span></span><br><span class="line">     <span class="comment">// 直到发送成功某消息,只要有一个成功(意味着该信道被占用)，就返回</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Tuple&lt;Message, Connection&gt; <span class="title">tryMessagesForConnected</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			List&lt;Tuple&lt;Message, Connection&gt;&gt; tuples)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (tuples.size() == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">for</span> (Tuple&lt;Message, Connection&gt; t : tuples) &#123;</span><br><span class="line">			Message m = t.getKey();</span><br><span class="line">			Connection con = t.getValue();</span><br><span class="line">			<span class="keyword">if</span> (startTransfer(m, con) == RCV_OK) &#123;</span><br><span class="line">				<span class="keyword">return</span> t;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	 <span class="comment">/**</span></span><br><span class="line"><span class="comment">	  * Goes trough the messages until the other node accepts one</span></span><br><span class="line"><span class="comment">	  * for receiving (or doesn't accept any). If a transfer is started, the</span></span><br><span class="line"><span class="comment">	  * connection is included in the list of sending connections.</span></span><br><span class="line"><span class="comment">	  * <span class="doctag">@param</span> con Connection trough which the messages are sent</span></span><br><span class="line"><span class="comment">	  * <span class="doctag">@param</span> messages A list of messages to try</span></span><br><span class="line"><span class="comment">	  * <span class="doctag">@return</span> The message whose transfer was started or null if no </span></span><br><span class="line"><span class="comment">	  * transfer was started. </span></span><br><span class="line"><span class="comment">	  */</span></span><br><span class="line">	  <span class="comment">// 遍历消息，传输消息给con,直到con接收</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Message <span class="title">tryAllMessages</span><span class="params">(Connection con, List&lt;Message&gt; messages)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (Message m : messages) &#123;</span><br><span class="line">			<span class="keyword">int</span> retVal = startTransfer(m, con); </span><br><span class="line">			<span class="keyword">if</span> (retVal == RCV_OK) &#123;</span><br><span class="line">				<span class="keyword">return</span> m;	<span class="comment">// accepted a message, don't try others</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (retVal &gt; <span class="number">0</span>) &#123; </span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// should try later -&gt; don't bother trying others</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">// no message was accepted		</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to send all given messages to all given connections. Connections</span></span><br><span class="line"><span class="comment">	 * are first iterated in the order they are in the list and for every</span></span><br><span class="line"><span class="comment">	 * connection, the messages are tried in the order they are in the list.</span></span><br><span class="line"><span class="comment">	 * Once an accepting connection is found, no other connections or messages</span></span><br><span class="line"><span class="comment">	 * are tried.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> messages The list of Messages to try</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> connections The list of Connections to try</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> The connections that started a transfer or null if no connection</span></span><br><span class="line"><span class="comment">	 * accepted a message.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 从邻居列表中从前到后找到第一个可以能够成功发送消息的邻居节点</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Connection <span class="title">tryMessagesToConnections</span><span class="params">(List&lt;Message&gt; messages,</span></span></span><br><span class="line"><span class="function"><span class="params">			List&lt;Connection&gt; connections)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>, n=connections.size(); i&lt;n; i++) &#123;</span><br><span class="line">			Connection con = connections.get(i);</span><br><span class="line">			Message started = tryAllMessages(con, messages); </span><br><span class="line">			<span class="keyword">if</span> (started != <span class="keyword">null</span>) &#123; </span><br><span class="line">				<span class="keyword">return</span> con;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Tries to send all messages that this router is carrying to all</span></span><br><span class="line"><span class="comment">	 * connections this node has. Messages are ordered using the </span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> MessageRouter#sortByQueueMode(List)&#125;. See </span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> #tryMessagesToConnections(List, List)&#125; for sending details.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> The connections that started a transfer or null if no connection</span></span><br><span class="line"><span class="comment">	 * accepted a message.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 将节点的所有消息发送给自己所有的邻居</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Connection <span class="title">tryAllMessagesToAllConnections</span><span class="params">()</span></span>&#123;</span><br><span class="line">		List&lt;Connection&gt; connections = getConnections();</span><br><span class="line">		<span class="keyword">if</span> (connections.size() == <span class="number">0</span> || <span class="keyword">this</span>.getNrofMessages() == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		List&lt;Message&gt; messages = </span><br><span class="line">			<span class="keyword">new</span> ArrayList&lt;Message&gt;(<span class="keyword">this</span>.getMessageCollection());</span><br><span class="line">		<span class="keyword">this</span>.sortByQueueMode(messages);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> tryMessagesToConnections(messages, connections);</span><br><span class="line">	&#125;</span><br><span class="line">		</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Exchanges deliverable (to final recipient) messages between this host</span></span><br><span class="line"><span class="comment">	 * and all hosts this host is currently connected to. First all messages</span></span><br><span class="line"><span class="comment">	 * from this host are checked and then all other hosts are asked for</span></span><br><span class="line"><span class="comment">	 * messages to this host. If a transfer is started, the search ends.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> A connection that started a transfer or null if no transfer</span></span><br><span class="line"><span class="comment">	 * was started</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="comment">// exchangeDeliverableMessages用于交换该节点与邻居节点间的消息，这些消息的目的节点是该节点或者其邻居节点。</span></span><br><span class="line">	<span class="comment">// 值得注意的是：该节点可能会有多个邻居节点（The ONE表示为多个connection），但只能让一个connection传输数据，想想无线信道。</span></span><br><span class="line">	<span class="comment">// 所以，只有有一个消息能传输到目的节点，就返回。</span></span><br><span class="line">	<span class="comment">// return值 开始传输的连接，如果没有传输，则为null</span></span><br><span class="line">	<span class="comment">// 先看本节点是否有消息的某个邻居节点，如果没有，再查看邻居节点是否有消息的目的节点是本节点。</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Connection <span class="title">exchangeDeliverableMessages</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		List&lt;Connection&gt; connections = getConnections();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (connections.size() == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// tryMessagesForConnected，尝试将上述返回的消息发送到目的节点（值得注意的是：只能发一个）</span></span><br><span class="line">		<span class="meta">@SuppressWarnings</span>(value = <span class="string">"unchecked"</span>)</span><br><span class="line">		Tuple&lt;Message, Connection&gt; t =</span><br><span class="line">			tryMessagesForConnected(sortByQueueMode(getMessagesForConnected()));</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> t.getValue(); <span class="comment">// started transfer</span></span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// didn't start transfer to any node -&gt; ask messages from connected</span></span><br><span class="line">		<span class="keyword">for</span> (Connection con : connections) &#123;</span><br><span class="line">			<span class="keyword">if</span> (con.getOtherNode(getHost()).requestDeliverableMessages(con)) &#123;</span><br><span class="line">				<span class="keyword">return</span> con;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Shuffles a messages list so the messages are in random order.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> messages The list to sort and shuffle</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 随机列消息列表</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">shuffleMessages</span><span class="params">(List&lt;Message&gt; messages)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (messages.size() &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span>; <span class="comment">// nothing to shuffle</span></span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		Random rng = <span class="keyword">new</span> Random(SimClock.getIntTime());</span><br><span class="line">		Collections.shuffle(messages, rng);	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Adds a connections to sending connections which are monitored in</span></span><br><span class="line"><span class="comment">	 * the update.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> #update()</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> con The connection to add</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 增加一个邻居节点</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">addToSendingConnections</span><span class="params">(Connection con)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.sendingConnections.add(con);</span><br><span class="line">	&#125;</span><br><span class="line">		</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns true if this router is transferring something at the moment or</span></span><br><span class="line"><span class="comment">	 * some transfer has not been finalized.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> true if this router is transferring something</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 判断是否正在传输  若正在传输返回true 否则返回false</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isTransferring</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 正在传输</span></span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.sendingConnections.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// sending something</span></span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		List&lt;Connection&gt; connections = getConnections();</span><br><span class="line">		<span class="comment">// 邻居节点数目为0</span></span><br><span class="line">		<span class="keyword">if</span> (connections.size() == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// not connected</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">/*	private boolean isUp;				// 连接是否建立</span></span><br><span class="line"><span class="comment">			protected Message msgOnFly;			// 连接是否被占用</span></span><br><span class="line"><span class="comment">			public boolean isReadyForTransfer() &#123;</span></span><br><span class="line"><span class="comment">					return this.isUp &amp;&amp; this.msgOnFly == null; </span></span><br><span class="line"><span class="comment">			&#125;</span></span><br><span class="line"><span class="comment">		*/</span></span><br><span class="line">		<span class="comment">// 根据下面注释的意思是当 isReadyForTransfer() 返回false表示未准备好</span></span><br><span class="line">		<span class="comment">// 应该是 isReadyForTransfer() 只有准备好但未进行传输才返回true, 但传输了就返回false</span></span><br><span class="line">		<span class="comment">// 有邻居节点，但有链路正在传输</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>, n=connections.size(); i&lt;n; i++) &#123;</span><br><span class="line">			Connection con = connections.get(i);</span><br><span class="line">			<span class="keyword">if</span> (!con.isReadyForTransfer()) &#123;	</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;	<span class="comment">// a connection isn't ready for new transfer </span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;		</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns true if this router is currently sending a message with </span></span><br><span class="line"><span class="comment">	 * &lt;CODE&gt;msgId&lt;/CODE&gt;.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> msgId The ID of the message</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> True if the message is being sent false if not</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">//</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 如果此路由器当前正在发送msgId，则返回true</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSending</span><span class="params">(String msgId)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (Connection con : <span class="keyword">this</span>.sendingConnections) &#123;</span><br><span class="line">			<span class="keyword">if</span> (con.getMessage() == <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">continue</span>; <span class="comment">// transmission is finalized</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (con.getMessage().getId().equals(msgId)) &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Returns true if the node has energy left (i.e., energy modeling is</span></span><br><span class="line"><span class="comment">	 * enabled OR (is enabled and model has energy left))</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> has the node energy</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasEnergy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.energy == <span class="keyword">null</span> || <span class="keyword">this</span>.energy.getEnergy() &gt; <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Checks out all sending connections to finalize the ready ones </span></span><br><span class="line"><span class="comment">	 * and abort those whose connection went down. Also drops messages</span></span><br><span class="line"><span class="comment">	 * whose TTL &lt;= 0 (checking every one simulated minute).</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> #addToSendingConnections(Connection)</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	*update()主要做的五件事</span></span><br><span class="line"><span class="comment">	*1.处理已完成传输的数据包</span></span><br><span class="line"><span class="comment">	*2.中止那些断开链路上的数据包</span></span><br><span class="line"><span class="comment">	*3.必要时，删除那些最早接收到且不正在传输的消息</span></span><br><span class="line"><span class="comment">	*4.丢弃那些TTL到期的数据包（只在没有消息发送的情况）</span></span><br><span class="line"><span class="comment">	*5.更新能量模板</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 调用父类的update() ==&gt; MessageRouter().update()</span></span><br><span class="line">		<span class="keyword">super</span>.update();				</span><br><span class="line">		</span><br><span class="line">		<span class="comment">/* in theory we can have multiple sending connections even though</span></span><br><span class="line"><span class="comment">		  currently all routers allow only one concurrent sending connection */</span></span><br><span class="line">		<span class="comment">// 理论上我们的host可以同时向多个节点发送链接,但是模拟的时候单个依次遍历达到模拟的目的</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="keyword">this</span>.sendingConnections.size(); ) &#123;</span><br><span class="line">			<span class="keyword">boolean</span> removeCurrent = <span class="keyword">false</span>;</span><br><span class="line">			Connection con = sendingConnections.get(i);</span><br><span class="line">			</span><br><span class="line">			 <span class="comment">/*** 1. 处理已完成传输的数据包 ***/</span></span><br><span class="line">			<span class="keyword">if</span> (con.isMessageTransferred()) &#123;</span><br><span class="line">				<span class="keyword">if</span> (con.getMessage() != <span class="keyword">null</span>) &#123;</span><br><span class="line">					transferDone(con);</span><br><span class="line">					con.finalizeTransfer();</span><br><span class="line">				&#125; <span class="comment">/* else: some other entity aborted transfer */</span></span><br><span class="line">				removeCurrent = <span class="keyword">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">/* 2. 中止那些断开链路上的数据包 */</span></span><br><span class="line">			<span class="comment">// isUp() 判定this 对象与con 的链接 如果已经链接返回true 否则返回false;</span></span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span> (!con.isUp()) &#123;</span><br><span class="line">				<span class="keyword">if</span> (con.getMessage() != <span class="keyword">null</span>) &#123;</span><br><span class="line">					transferAborted(con);</span><br><span class="line">					con.abortTransfer();</span><br><span class="line">				&#125;</span><br><span class="line">				removeCurrent = <span class="keyword">true</span>;</span><br><span class="line">			&#125; </span><br><span class="line">			</span><br><span class="line">			<span class="comment">/* 3. 必要时，删除那些最早接收到且不正在传输的消息 */</span></span><br><span class="line">			<span class="keyword">if</span> (removeCurrent) &#123;</span><br><span class="line">				<span class="comment">// if the message being sent was holding excess buffer, free it</span></span><br><span class="line">				<span class="keyword">if</span> (<span class="keyword">this</span>.getFreeBufferSize() &lt; <span class="number">0</span>) &#123;</span><br><span class="line">					<span class="keyword">this</span>.makeRoomForMessage(<span class="number">0</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				sendingConnections.remove(i);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="comment">/* index increase needed only if nothing was removed */</span></span><br><span class="line">				i++;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		 <span class="comment">/*** 4. 丢弃那些TTL到期的数据包(只在没有消息发送的情况) ***/</span></span><br><span class="line">		<span class="keyword">if</span> (SimClock.getTime() - lastTtlCheck &gt;= TTL_CHECK_INTERVAL &amp;&amp; </span><br><span class="line">				sendingConnections.size() == <span class="number">0</span>) &#123;</span><br><span class="line">			dropExpiredMessages();</span><br><span class="line">			lastTtlCheck = SimClock.getTime();</span><br><span class="line">		&#125;</span><br><span class="line">		 <span class="comment">/*** 5. 更新能量模板 ***/</span></span><br><span class="line">		<span class="keyword">if</span> (energy != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="comment">/* <span class="doctag">TODO:</span> add support for other interfaces */</span></span><br><span class="line">			NetworkInterface iface = getHost().getInterface(<span class="number">1</span>);</span><br><span class="line">			energy.update(iface, getHost().getComBus());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Method is called just before a transfer is aborted at &#123;<span class="doctag">@link</span> #update()&#125; </span></span><br><span class="line"><span class="comment">	 * due connection going down. This happens on the sending host. </span></span><br><span class="line"><span class="comment">	 * Subclasses that are interested of the event may want to override this. </span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> con The connection whose transfer was aborted</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	 <span class="comment">// 中断传输的链接,con是被中断的节点</span></span><br><span class="line">	 <span class="comment">// 发生在主动链接的host上</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">transferAborted</span><span class="params">(Connection con)</span> </span>&#123; &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Method is called just before a transfer is finalized </span></span><br><span class="line"><span class="comment">	 * at &#123;<span class="doctag">@link</span> #update()&#125;.</span></span><br><span class="line"><span class="comment">	 * Subclasses that are interested of the event may want to override this.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> con The connection whose transfer was finalized</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 传送完成之前调用, 表明con已经传送完成</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">transferDone</span><span class="params">(Connection con)</span> </span>&#123; &#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> RoutingInfo <span class="title">getRoutingInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		RoutingInfo top = <span class="keyword">super</span>.getRoutingInfo();</span><br><span class="line">		<span class="keyword">if</span> (energy != <span class="keyword">null</span>) &#123;</span><br><span class="line">			top.addMoreInfo(<span class="keyword">new</span> RoutingInfo(<span class="string">"Energy level: "</span> + </span><br><span class="line">					String.format(<span class="string">"%.2f mAh"</span>, energy.getEnergy() / <span class="number">3600</span>)));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> top;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ONE平台/" rel="tag"># ONE平台</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/JAVA/" rel="tag"># JAVA</a>
+          
+            <a href="/tags/机会网络/" rel="tag"># 机会网络</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/31/LeetCode-560-和为K的子数组/" rel="next" title="LeetCode 560.和为K的子数组">
+                <i class="fa fa-chevron-left"></i> LeetCode 560.和为K的子数组
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/13/Knuth洗牌算法/" rel="prev" title="Knuth洗牌算法">
+                Knuth洗牌算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

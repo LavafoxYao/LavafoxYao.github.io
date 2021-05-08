@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ONE平台,机会网络,python,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="每次做One平台的实验，输入坐标绘制图像真是件折磨人的事，昨天晚上突然想自己写个脚本来实现这件事。从此画图无忧,哈哈哈哈哈。 python初学者，下面代码是一边查语法书一边写出来的….哈哈哈哈。">
+<meta name="keywords" content="ONE平台,机会网络,python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用于生成One平台实验图的脚本及使用方法">
+<meta property="og:url" content="http://yoursite.com/2020/08/17/用于生成One平台实验图的脚本/index.html">
+<meta property="og:site_name" content="Wuyooyoo&#39;s Blog">
+<meta property="og:description" content="每次做One平台的实验，输入坐标绘制图像真是件折磨人的事，昨天晚上突然想自己写个脚本来实现这件事。从此画图无忧,哈哈哈哈哈。 python初学者，下面代码是一边查语法书一边写出来的….哈哈哈哈。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_09-22-46.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_08-33-24.png">
+<meta property="og:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_09-12-32.png">
+<meta property="og:updated_time" content="2021-05-08T18:18:19.141Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用于生成One平台实验图的脚本及使用方法">
+<meta name="twitter:description" content="每次做One平台的实验，输入坐标绘制图像真是件折磨人的事，昨天晚上突然想自己写个脚本来实现这件事。从此画图无忧,哈哈哈哈哈。 python初学者，下面代码是一边查语法书一边写出来的….哈哈哈哈。">
+<meta name="twitter:image" content="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_09-22-46.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/17/用于生成One平台实验图的脚本/">
+
+
+
+
+
+  <title>用于生成One平台实验图的脚本及使用方法 | Wuyooyoo's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  
+  <script type="text/javascript" color="25,202,173" opacity="0.8" zindex="-2" count="28" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Wuyooyoo's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">路漫漫其修远兮，吾将上下而求索。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/17/用于生成One平台实验图的脚本/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Wuyooyoo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wuyooyoo's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">用于生成One平台实验图的脚本及使用方法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-17T00:18:16+08:00">
+                2020-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工具/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>每次做<code>One</code>平台的实验，输入坐标绘制图像真是件折磨人的事，昨天晚上突然想自己写个脚本来实现这件事。从此画图无忧,哈哈哈哈哈。</p>
+<p><code>python</code>初学者，下面代码是一边查语法书一边写出来的….哈哈哈哈。</p>
+<a id="more"></a>
+
+<h2 id="绘图脚本"><a href="#绘图脚本" class="headerlink" title="绘图脚本"></a>绘图脚本</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> os, sys</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict, defaultdict</span><br><span class="line"></span><br><span class="line">dict = &#123;<span class="string">"delivery_prob"</span>: <span class="number">9</span>, <span class="string">"response_prob"</span>: <span class="number">10</span>, <span class="string">"overhead_ratio"</span>: <span class="number">11</span>, <span class="string">"latency_avg"</span>: <span class="number">12</span>, <span class="string">"latency_med"</span>: <span class="number">13</span>,</span><br><span class="line">        <span class="string">"hopcount_avg"</span>: <span class="number">14</span>, <span class="string">"hopcount_med"</span>: <span class="number">15</span>, <span class="string">"buffertime_avg"</span>: <span class="number">16</span>, <span class="string">"buffertime_med"</span>: <span class="number">17</span>&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">########################</span></span><br><span class="line"><span class="comment"># 文件目录</span></span><br><span class="line">path = <span class="string">r"F:\One平台\reports\reports"</span></span><br><span class="line"><span class="comment">#path = r"F:\One平台\reports\921添加相似度不加ACK"</span></span><br><span class="line"><span class="comment"># 画图的纵坐标与横坐标的名称</span></span><br><span class="line">COLNAME = <span class="string">"latency_avg"</span></span><br><span class="line">ROWNAME = <span class="string">"Buffsize"</span></span><br><span class="line"><span class="comment"># 比较指标 ==&gt;比如 deliver_prob</span></span><br><span class="line">norm = dict[<span class="string">"latency_avg"</span>]</span><br><span class="line"><span class="comment">##########################</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getfilename</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 获得目录下所有的文件名</span></span><br><span class="line">    allfiles = os.listdir(path)</span><br><span class="line">    <span class="comment"># os.path.getmtime() 函数是获取文件最后修改时间</span></span><br><span class="line">    <span class="comment">#allfiles = sorted(allfiles, key=lambda x: os.path.getmtime(os.path.join(path, x)))</span></span><br><span class="line">    files = []</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> allfiles:</span><br><span class="line">        <span class="keyword">if</span> file.endswith(<span class="string">r".txt"</span>):</span><br><span class="line">            files.append(file)</span><br><span class="line">    <span class="keyword">return</span> files</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getalgoname</span><span class="params">()</span>:</span></span><br><span class="line">    files = getfilename()</span><br><span class="line">    <span class="comment"># 将算法的名称存储到algo_name中</span></span><br><span class="line">    algo_name = set()</span><br><span class="line">    <span class="keyword">for</span> f <span class="keyword">in</span> files:</span><br><span class="line">        <span class="comment">#algo_name.add(re.search(r'^([A-Z]*[a-z]*)&#123;2&#125;', f).group())</span></span><br><span class="line">        algo_name.add(re.search(<span class="string">r'\d&#123;1,5&#125;'</span>, f).group())</span><br><span class="line">        <span class="comment">#print(algo_name);</span></span><br><span class="line">    <span class="keyword">return</span> algo_name</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getdata</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># algodict = dict&#123;&#125;</span></span><br><span class="line">    <span class="keyword">global</span> target</span><br><span class="line">    files = getfilename()</span><br><span class="line">    algomap = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> file <span class="keyword">in</span> files:</span><br><span class="line">        <span class="comment"># 打开文件</span></span><br><span class="line">        f = open(path + <span class="string">"\\"</span> + file)</span><br><span class="line">        <span class="comment"># 正则匹配 截取符合下列规则的字符串</span></span><br><span class="line">        <span class="comment"># 截取数字之前的字符串</span></span><br><span class="line">        name = re.search(<span class="string">r'([A-Z]*[a-z]*)&#123;3&#125;'</span>, file).group()</span><br><span class="line">        <span class="comment"># 截取文件名中的浮点数</span></span><br><span class="line">        para = re.search(<span class="string">r'[0-9]*\.?[0-9]+'</span>, file).group()</span><br><span class="line">        read_buf = []</span><br><span class="line">        <span class="comment"># 读取文件中所有的数据</span></span><br><span class="line">        <span class="keyword">for</span> r <span class="keyword">in</span> f:</span><br><span class="line">            read_buf.append(r)</span><br><span class="line">        <span class="comment"># 如果读取的文件是空的就continue</span></span><br><span class="line">        <span class="keyword">if</span> len(read_buf) &lt;= <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># 读取list中的数据,并且用split分割一次(2部分)并且取第二个元素</span></span><br><span class="line">        str = read_buf[norm].split(<span class="string">':'</span>, <span class="number">1</span>)[<span class="number">1</span>]</span><br><span class="line">        <span class="comment"># 并将其分割成只含数字字符串的list</span></span><br><span class="line">        target = (str.replace(<span class="string">"\n"</span>, <span class="string">""</span>).replace(<span class="string">"\r"</span>, <span class="string">""</span>).replace(<span class="string">" "</span>, <span class="string">""</span>))</span><br><span class="line">        <span class="comment"># 当name不存在algomap中就新建一个&#123;&#125; 去存储 para 和 target</span></span><br><span class="line">        <span class="keyword">if</span> name <span class="keyword">not</span> <span class="keyword">in</span> algomap.keys():</span><br><span class="line">            algomap[name] = &#123;&#125;</span><br><span class="line">        <span class="comment"># 这里相当于dict&#123;"":&#123;&#125;&#125;</span></span><br><span class="line">        algomap[name][float(para)] = target</span><br><span class="line">    <span class="keyword">return</span> algomap</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">painting</span><span class="params">()</span>:</span></span><br><span class="line">    algomap = getdata()</span><br><span class="line">    <span class="comment"># 折线的颜色</span></span><br><span class="line">    color = [<span class="string">"#F4606C"</span>, <span class="string">"#7B68EE"</span>, <span class="string">"#40E0D0"</span>, <span class="string">"#F4A460"</span>, <span class="string">"#B5495B"</span>, <span class="string">"#BEEDC7"</span>, <span class="string">"#D1BA74"</span>, <span class="string">"#FB966E"</span>, <span class="string">"#FFC408"</span>]</span><br><span class="line">    <span class="comment">#折线的形状</span></span><br><span class="line">    marker = [<span class="string">r"-o"</span>, <span class="string">r"-*"</span>, <span class="string">r"-^"</span>, <span class="string">r"-v"</span>, <span class="string">r"-D"</span>, <span class="string">r"+"</span>,  <span class="string">r"x"</span>, <span class="string">r"&lt;"</span>, <span class="string">r"&gt;"</span>]</span><br><span class="line">    <span class="comment"># 图的名称</span></span><br><span class="line">    plt.figure(<span class="string">'DTN experimental data fig'</span>)</span><br><span class="line">    ax = plt.gca()</span><br><span class="line">    <span class="comment"># 设置x轴、y轴名称</span></span><br><span class="line">    ax.set_xlabel(ROWNAME)</span><br><span class="line">    ax.set_ylabel(COLNAME)</span><br><span class="line">    cnt = <span class="number">0</span></span><br><span class="line">    <span class="comment"># x的界限</span></span><br><span class="line">    x_min = sys.maxsize</span><br><span class="line">    x_max = -sys.maxsize - <span class="number">1</span></span><br><span class="line">    <span class="comment"># y轴的界限</span></span><br><span class="line">    y_min = sys.maxsize</span><br><span class="line">    y_max = -sys.maxsize - <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> algomap:</span><br><span class="line">        x_list = []</span><br><span class="line">        y_list = []</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> sorted(algomap[key]):</span><br><span class="line">            x_min = min(x_min, k)</span><br><span class="line">            x_max = max(x_max, k)</span><br><span class="line">            y_min = min(y_min, float(algomap[key][k]))</span><br><span class="line">            y_max = max(y_max, float(algomap[key][k]))</span><br><span class="line">            x_list.append(str(k))</span><br><span class="line">            y_list.append(algomap[key][k])</span><br><span class="line">        print(x_list)</span><br><span class="line">        print(y_list)</span><br><span class="line">        x_list = list(map(float, x_list))</span><br><span class="line">        y_list = list(map(float, y_list))</span><br><span class="line">        <span class="comment"># 画连线图，以x_list中的值为横坐标，以y_list中的值为纵坐标</span></span><br><span class="line">        <span class="comment"># 参数c指定连线的颜色，linewidth 指定连线宽度，alpha指定连线的透明度</span></span><br><span class="line">        ax.plot(x_list, y_list, marker[cnt], label=key, color=color[cnt], linestyle=<span class="string">'-'</span>, linewidth=<span class="number">2</span>, alpha=<span class="number">0.9</span>)</span><br><span class="line">        cnt += <span class="number">1</span></span><br><span class="line">    <span class="comment"># diff_x x轴的为上界和下界之间的差值</span></span><br><span class="line">    diff_x = x_max - x_min</span><br><span class="line">    dir_min_x = x_min - diff_x / <span class="number">8</span></span><br><span class="line">    dir_max_x = x_max + diff_x / <span class="number">8</span></span><br><span class="line">    <span class="comment"># diff_y y轴的为上界和下界之间的差值</span></span><br><span class="line">    diff_y = y_max - y_min</span><br><span class="line">    dir_min_y = y_min - diff_y / <span class="number">8</span></span><br><span class="line">    dir_max_y = y_max + diff_y / <span class="number">2</span></span><br><span class="line">    <span class="comment"># 设置X轴的范围</span></span><br><span class="line">    plt.xlim(dir_min_x, dir_max_x)</span><br><span class="line">    <span class="comment"># 设置y轴的范围</span></span><br><span class="line">    plt.ylim(dir_min_y, dir_max_y)</span><br><span class="line">    <span class="comment"># plt.lengend() 生成图例,为了帮助我们展示每个数据对应的图像名称</span></span><br><span class="line">    <span class="comment"># loc 固定图例的位置 prop 设置图例的属性</span></span><br><span class="line">    plt.legend(loc=<span class="string">"upper right"</span>, prop=&#123;<span class="string">'size'</span>: <span class="number">7</span>&#125;)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    painting()</span><br></pre></td></tr></table></figure>
+
+<h2 id="绘图脚本的使用方法"><a href="#绘图脚本的使用方法" class="headerlink" title="绘图脚本的使用方法"></a>绘图脚本的使用方法</h2><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>查看自己<code>python</code>现在在用的解释器是否安装了<code>matplotlib</code>包，我会提供一个自动安装<code>matplotlib</code>的脚本，使用这个脚本安装的前提条件是你安装的<code>pycharm</code>都是默认安装，最主要的一点是不要改当前使用<code>python</code>解释器的路径。<strong>（如果你已经很熟悉怎么去切换python的解释器以及安装python包的过程,上述直接无视）</strong></p>
+<p>自动化安装的脚本<code>auto_matplotlib.bat</code>，直接双击执行即可。再按<code>windows+R</code>输入<code>CMD</code>，在CMD中输入<code>pip list</code>，查看<code>matplotlib</code>包是否安装成功。若安装成功,如红色框图所示.</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_09-22-46.png" alt></p>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_08-33-24.png" alt></p>
+<p><code>path</code> 是你生成 <code>reports</code> 的路径(<strong><code>path</code>是每次读取<code>reports</code>的路径</strong>)<br><code>COLNAME</code> 是画图的纵坐标的名称<br><code>ROWNAME</code> 是画图的横坐标的名称</p>
+<p><img src="https://wooyooyoo-photo.oss-cn-hangzhou.aliyuncs.com/blog/2020/09/Snipaste_2020-09-08_09-12-32.png" alt></p>
+<p><code>norm</code> 是你指定的比较指标，是在上面的 <code>dict</code>中直接复制替换即可.<br>综上所述🏉如果已经指定好了<code>path</code> 路径，每次实验只需修改<code>COLNAME</code> 、 <code>ROWNAME</code> 、 <code>norm</code> 。</p>
+<p><strong><code>path</code>是每次读取<code>reports</code>的路径</strong></p>
+<h3 id="使用的注意事项"><a href="#使用的注意事项" class="headerlink" title="使用的注意事项"></a>使用的注意事项</h3><ol>
+<li>由于我只选取了8组颜色与线段的类型，一次实验对比最多最多只能有8种。</li>
+<li>要保证 reports 中的报告是能够正常换行的。一个指标是一行，而不是不能换行的。</li>
+<li>在自定义给算法命名的时候<strong>切忌不要使用数字</strong>，比如生成报告的名称不要取 <code>mytest1</code>类似于这样<br>的名称,而尽量使用 <code>mytestA</code>，<strong>否则在读取报告的时候会出现被程序误解的困难</strong>。</li>
+<li>生成的<code>reports</code>不要使用中文!!</li>
+</ol>
+<h3 id="第二版"><a href="#第二版" class="headerlink" title="第二版"></a>第二版</h3><p>解决第一版存在的两个问题:</p>
+<ol>
+<li>无法读取报告名字中的浮点数</li>
+<li>无法在报告文件夹中包含其他类型的文件</li>
+<li>增加实验组的对比上限,从原来最多做6组对比上升到8组</li>
+</ol>
+<h3 id="第三版"><a href="#第三版" class="headerlink" title="第三版"></a>第三版</h3><p>解决第二版存在的一个问题：</p>
+<ol>
+<li>图例在图中不固定会穿插到绘图的空白处，现已固定在绘图的右上角处，一般来说如果数据正常绘制的线段不会与图例重叠。</li>
+</ol>
+<p><strong>如果你有什么好的设计想法以及需要完善功能也可以与我一起讨论，并对上述代码进行改进。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ONE平台/" rel="tag"># ONE平台</a>
+          
+            <a href="/tags/机会网络/" rel="tag"># 机会网络</a>
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/13/Knuth洗牌算法/" rel="next" title="Knuth洗牌算法">
+                <i class="fa fa-chevron-left"></i> Knuth洗牌算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/19/LeetCode-297-二叉树的序列化/" rel="prev" title="LeetCode 297.二叉树的序列化">
+                LeetCode 297.二叉树的序列化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Wuyooyoo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">132</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:haoerbi99@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#绘图脚本"><span class="nav-text">绘图脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绘图脚本的使用方法"><span class="nav-text">绘图脚本的使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境"><span class="nav-text">环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用方法"><span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用的注意事项"><span class="nav-text">使用的注意事项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二版"><span class="nav-text">第二版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三版"><span class="nav-text">第三版</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+
+<span class="with-love" id="animate" style="font-size: 13px">
+	<i class="fa fa-heart"></i>
+</span>
+
+  
+  <span class="author" itemprop="copyrightHolder">Wuyooyoo</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by </div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
